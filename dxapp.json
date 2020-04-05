@@ -73,5 +73,5 @@
     "interpreter": "bash",
     "distribution": "Ubuntu",
     "release":"16.04"
-  },
+  }
 }
