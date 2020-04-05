@@ -1,7 +1,7 @@
 {
   "name": "eggd_picardqc_v1.0.0",
   "title": "eggd Picard QC v1.0.0",
-  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC; MarkDuplicates (capture only), CollectMultipleMetrics and CalculateHsMetrics",
+  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
   "properties": {
     "github release": "v1.0.0"
   },
@@ -12,21 +12,31 @@
       "label": "Sorted Mappings",
       "help": "An input BAM file for deduplicating and/or Picard Tools QC suites",
       "class": "file",
-      "patterns": ["*.bam"]
+      "patterns": ["*.bam"],
+      "optional": false
     },
     {
       "name": "fasta_index",
       "label": "Reference FASTA index archive",
       "help": "A gzipped tarball containing the reference genome files genome.fa, genome.fa.fai and genome.dict.",
       "class": "file",
-      "patterns": ["*.fasta-index.tar.gz"]
+      "patterns": ["*.fasta-index.tar.gz"],
+      "suggestions": [
+        {
+          "name": "DNAnexus Apps Data (AWS Germany)",
+          "project": "project-F3zqGV04fXX5j7566869fjFq",
+          "path": "/"
+        }
+      ],
+      "optional": false
     },
     {
       "name": "bedfile",
       "label": "Bedfile used to calculate HS metrics",
       "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
       "class": "file",
-      "patterns": ["*.bed"]
+      "patterns": ["*.bed"],
+      "optional": false
     },
     {
       "name": "enrichment_method",
@@ -34,7 +44,8 @@
       "help": "Capture panels require multiple metrics/HS metrics. Amplicon capture require targetedPCRmetrics.",
       "class": "string", 
       "choices": ["Amplicon","Hybridisation"],
-      "group": "Enrichment method"
+      "group": "Enrichment method",
+      "optional": false
     }
   ],
   "outputSpec": [
@@ -58,19 +69,9 @@
         }
       }
     },
-    "systemRequirements": {
-      "main": {
-        "instanceType": "mem1_ssd1_x4"
-      }
-    },
     "file": "src/code.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
     "release":"16.04"
   },
-  "details": {
-    "whatsNew": "* 1.0.0: First release\n*App has samtools v1.9, picard v2.22.2 bundled",
-    "upstreamUrls": ["http://broadinstitute.github.io/picard/", "http://picard.sourceforge.net/", "https://github.com/samtools/htslib", "https://github.com/samtools/samtools"],
-    "upstreamLicenses": ["Apache License V2.0", "MIT License", "MIT, BSD-3-Clause", "MIT"]
-  }
 }

@@ -33,8 +33,8 @@ collect_multiple_metrics() {
 	# All outputs are saved to $output_dir (defined in main()) for upload to DNAnexus.
 	# Note that not all outputs are relevent for all types of sequencing
 	# e.g. some aren't applicable for amplicon NGC
-	# Note that CollectSequencingArtifactMetrics errors out with TSO500 stitched BAMs due to 
-	# "Record contains library that is missing from header" and so not used
+	# Note that CollectSequencingArtifactMetrics errors out with TSO500 BAMs due to 
+	# "Record contains library that is missing from header" and so not used (fix unclear)
 	$java -jar /picard.jar CollectMultipleMetrics I="$sorted_bam_path" R=genome.fa \
 	PROGRAM=null \
 	PROGRAM=CollectAlignmentSummaryMetrics \
