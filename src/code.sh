@@ -7,7 +7,13 @@ set -e -x -o pipefail
 create_interval_file() {
 	echo "create_interval_file"
 	# Converts a BED file to a Picard Interval List
-	# List https://gatk.broadinstitute.org/hc/en-us/articles/360037593251-BedToIntervalList-Picard-
+	# See https://gatk.broadinstitute.org/hc/en-us/articles/360037593251-BedToIntervalList-Picard-
+	# Note that SD can take any of the follow. Here we are using the BAM.
+	# - A file with .dict extension generated using Picard's CreateSequenceDictionaryTool
+	# - A reference.fa or reference.fasta file with a reference.dict in the same directory
+	# - Another IntervalList with @SQ lines in the header from which to generate a dictionary
+	# - A VCF that contains #contig lines from which to generate a sequence dictionary
+	# - A SAM or BAM file with @SQ lines in the header from which to generate a dictionary
 	$java -jar /picard.jar BedToIntervalList \
 	I="$bedfile_path" \
 	O=targets.picard \
@@ -48,7 +54,7 @@ collect_multiple_metrics() {
 	# PROGRAM=CollectSequencingArtifactMetrics \
 }
 
-calculate_hs_metrics() {
+collect_hs_metrics() {
 	echo "collect_hs_metrics"
 	# Call Picard CollectHsMetrics. Requires the co-ordinate sorted BAM file given to the app as
 	# input (I=). Outputs the hsmetrics.tsv and pertarget_coverage.tsv files to $output_dir
@@ -83,18 +89,27 @@ mkdir -p $output_dir
 # Create the interval file
 create_interval_file
 
-# if it's a capture panel call the relevant modules
-if [[ "$enrichment_method" == "Hybridisation" ]]; then
+# if run_CollectMultipleMetrics is true
+if [[ "$run_CollectMultipleMetrics" == true ]]; then
 # Call Picard CollectMultipleMetrics
 collect_multiple_metrics
-# Call Picard CalculateHSMetrics
-calculate_hs_metrics
+fi
 
-# if it's a amplicon panel call the relevant modules
-elif [[ "$enrichment_method" == "Amplicon" ]]; then
+# if run_CollectHsMetrics is true
+if [[ "$run_CollectHsMetrics" == true ]]; then
+# Call Picard CollectHSMetrics
+collect_hs_metrics
+fi
+
+# if run_CollectTargetedPcrMetrics is true
+if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
+# Call Picard CollectTargetedPcrMetrics
 collect_targeted_pcr_metrics
-else
-echo "unknown capture type"
+fi
+
+# Catch all false
+if [[ "$run_CollectTargetedPcrMetrics" == false ]] && [[ "$run_CollectHsMetrics" == false ]] && [[ "$run_CollectMultipleMetrics" == false ]]; then
+echo "No picard functions selected!"
 fi
 
 ##### CLEAN UP #####

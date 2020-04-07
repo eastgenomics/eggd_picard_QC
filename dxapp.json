@@ -36,15 +36,33 @@
       "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
       "class": "file",
       "patterns": ["*.bed"],
+      "optional": true
+    },
+    {
+      "name": "run_CollectMultipleMetrics",
+      "label": "Choose whether to run Picard CollectMultipleMetrics",
+      "help": "Specifically, run CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, MeanQualityByCycle, CollectBaseDistributionByCycle, CollectGcBiasMetrics, CollectQualityYieldMetrics. See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-",
+      "class": "boolean", 
+      "default": true,
+      "group": "Picard functions",
       "optional": false
     },
     {
-      "name": "enrichment_method",
-      "label": "Hybridisation Capture or Amplicon",
-      "help": "Capture panels require multiple metrics/HS metrics. Amplicon capture require targetedPCRmetrics.",
-      "class": "string", 
-      "choices": ["Amplicon","Hybridisation"],
-      "group": "Enrichment method",
+      "name": "run_CollectHsMetrics",
+      "label": "Choose whether to run Picard CollectHsMetrics",
+      "help": "Collects hybrid-selection (HS) metrics for a SAM or BAM file. https://gatk.broadinstitute.org/hc/en-us/articles/360037591891-CollectHsMetrics-Picard-",
+      "class": "boolean", 
+      "default": true,
+      "group": "Picard functions",
+      "optional": false
+    },
+    {
+      "name": "run_CollectTargetedPcrMetrics",
+      "label": "Choose whether to run Picard CollectTargetedPcrMetrics",
+      "help": "Calculate PCR-related metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
+      "class": "boolean", 
+      "default": false,
+      "group": "Picard functions",
       "optional": false
     }
   ],
