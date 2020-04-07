@@ -1,0 +1,95 @@
+{
+  "name": "eggd_picardqc_v1.0.0",
+  "title": "eggd Picard QC v1.0.0",
+  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
+  "properties": {
+    "github release": "v1.0.0"
+  },
+  "dxapi": "1.0.0",
+  "inputSpec": [
+    {
+      "name": "sorted_bam",
+      "label": "Sorted Mappings",
+      "help": "An input BAM file for deduplicating and/or Picard Tools QC suites",
+      "class": "file",
+      "patterns": ["*.bam"],
+      "optional": false
+    },
+    {
+      "name": "fasta_index",
+      "label": "Reference FASTA index archive",
+      "help": "A gzipped tarball containing the reference genome files genome.fa, genome.fa.fai and genome.dict.",
+      "class": "file",
+      "patterns": ["*.fasta-index.tar.gz"],
+      "suggestions": [
+        {
+          "name": "DNAnexus Apps Data (AWS Germany)",
+          "project": "project-F3zqGV04fXX5j7566869fjFq",
+          "path": "/"
+        }
+      ],
+      "optional": false
+    },
+    {
+      "name": "bedfile",
+      "label": "Bedfile used to calculate HS metrics",
+      "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
+      "class": "file",
+      "patterns": ["*.bed"],
+      "optional": true
+    },
+    {
+      "name": "run_CollectMultipleMetrics",
+      "label": "Choose whether to run Picard CollectMultipleMetrics",
+      "help": "Specifically, run CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, MeanQualityByCycle, CollectBaseDistributionByCycle, CollectGcBiasMetrics, CollectQualityYieldMetrics. See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-",
+      "class": "boolean", 
+      "default": true,
+      "group": "Picard functions",
+      "optional": false
+    },
+    {
+      "name": "run_CollectHsMetrics",
+      "label": "Choose whether to run Picard CollectHsMetrics",
+      "help": "Collects hybrid-selection (HS) metrics for a SAM or BAM file. https://gatk.broadinstitute.org/hc/en-us/articles/360037591891-CollectHsMetrics-Picard-",
+      "class": "boolean", 
+      "default": true,
+      "group": "Picard functions",
+      "optional": false
+    },
+    {
+      "name": "run_CollectTargetedPcrMetrics",
+      "label": "Choose whether to run Picard CollectTargetedPcrMetrics",
+      "help": "Calculate PCR-related metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
+      "class": "boolean", 
+      "default": false,
+      "group": "Picard functions",
+      "optional": false
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "eggd_picard_stats",
+      "label": "Picard stats files",
+      "help": "The generated statistics files",
+      "class": "array:file"
+    }
+  ],
+  "runSpec": {
+    "execDepends": [
+      {
+        "name": "openjdk-8-jre-headless"
+      }
+    ],
+    "systemRequirementsByRegion": {
+      "aws:eu-central-1": {
+        "main": {
+          "instanceType": "mem1_ssd1_x4"
+        }
+      }
+    },
+    "file": "src/code.sh",
+    "interpreter": "bash",
+    "distribution": "Ubuntu",
+    "release":"16.04"
+  }
+}
