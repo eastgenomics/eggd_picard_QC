@@ -40,10 +40,11 @@
     },
     {
       "name": "run_CollectWgsMetrics",
-      "label": "Boolean to indicate whether the file is WGS",
+      "label": "Choose whether to run Picard CollectWgsMetrics",
       "help": "",
       "class": "boolean",
-      "optional": true
+      "default": false,
+      "optional": false
     },
     {
       "name": "run_CollectMultipleMetrics",
