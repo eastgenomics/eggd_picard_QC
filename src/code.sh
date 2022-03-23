@@ -22,13 +22,19 @@ create_interval_file() {
 
 collect_targeted_pcr_metrics() {
 	echo "collect_targeted_pcr_metrics"
+
+	args="I=$sorted_bam_path R=genome.fa 
+	O=$output_dir/$sorted_bam_prefix.targetPCRmetrics.txt
+	PER_TARGET_COVERAGE=$output_dir/$sorted_bam_prefix.perTargetCov.txt"
+
+	if [[ -f targets.picard ]]; then
+		args+=" TI=targets.picard AI=targets.picard"
+	fi
 	# Call Picard CollectMultipleMetrics. Requires the co-ordinate sorted BAM file given to the app
 	# as input. The file is referenced in this command with the option 'I=<input_file>'. Here, the
 	# downloaded BAM file path is accessed using the DNAnexus helper variable $sorted_bam_path.
 	# All outputs are saved to $output_dir (defined in main()) for upload to DNAnexus.
-	$java -jar /picard.jar CollectTargetedPcrMetrics  I="$sorted_bam_path" R=genome.fa \
-	O="$output_dir/$sorted_bam_prefix.targetPCRmetrics.txt" AI=targets.picard TI=targets.picard \
-	PER_TARGET_COVERAGE="$output_dir/$sorted_bam_prefix.perTargetCov.txt"
+	$java -jar /picard.jar CollectTargetedPcrMetrics $args
 }
 
 collect_multiple_metrics() {
@@ -56,13 +62,20 @@ collect_multiple_metrics() {
 
 collect_hs_metrics() {
 	echo "collect_hs_metrics"
+
+	args="I=$sorted_bam_path 
+	O=$output_dir/${sorted_bam_prefix}.hsmetrics.tsv R=genome.fa 
+	PER_TARGET_COVERAGE=$output_dir/${sorted_bam_prefix}.pertarget_coverage.tsv 
+	COVERAGE_CAP=100000"
+
+	if [[ -f targets.picard ]]; then
+		args+=" TI=targets.picard BI=targets.picard"
+	fi
+
 	# Call Picard CollectHsMetrics. Requires the co-ordinate sorted BAM file given to the app as
 	# input (I=). Outputs the hsmetrics.tsv and pertarget_coverage.tsv files to $output_dir
 	# (defined in main()) for upload to DNAnexus. Note that coverage cap is set to 100000 (default=200).
-	$java -jar /picard.jar CollectHsMetrics BI=targets.picard TI=targets.picard I="$sorted_bam_path" \
-	O="$output_dir/${sorted_bam_prefix}.hsmetrics.tsv" R=genome.fa \
-	PER_TARGET_COVERAGE="$output_dir/${sorted_bam_prefix}.pertarget_coverage.tsv" \
-	COVERAGE_CAP=100000
+	$java -jar /picard.jar CollectHsMetrics args
 }
 
 main() {
@@ -86,8 +99,9 @@ mkdir -p $output_dir
 
 ##### MAIN #####
 
-# Create the interval file
+if [[ "$bedfile_path" ]]; then
 create_interval_file
+fi
 
 # if run_CollectMultipleMetrics is true
 if [[ "$run_CollectMultipleMetrics" == true ]]; then
