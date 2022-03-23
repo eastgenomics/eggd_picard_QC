@@ -1,9 +1,9 @@
 {
-  "name": "eggd_picardqc_v1.0.0",
-  "title": "eggd Picard QC v1.0.0",
-  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
+  "name": "eggd_picardqc_v1.1.0",
+  "title": "eggd Picard QC v1.1.0",
+  "summary": "v1.1.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
   "properties": {
-    "github release": "v1.0.0"
+    "github release": "v1.1.0"
   },
   "dxapi": "1.0.0",
   "inputSpec": [
@@ -36,6 +36,13 @@
       "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
       "class": "file",
       "patterns": ["*.bed"],
+      "optional": true
+    },
+    {
+      "name": "run_CollectWgsMetrics",
+      "label": "Boolean to indicate whether the file is WGS",
+      "help": "",
+      "class": "boolean",
       "optional": true
     },
     {
