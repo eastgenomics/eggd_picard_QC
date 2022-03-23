@@ -22,19 +22,13 @@ create_interval_file() {
 
 collect_targeted_pcr_metrics() {
 	echo "collect_targeted_pcr_metrics"
-
-	args="I=$sorted_bam_path R=genome.fa 
-	O=$output_dir/$sorted_bam_prefix.targetPCRmetrics.txt
-	PER_TARGET_COVERAGE=$output_dir/$sorted_bam_prefix.perTargetCov.txt"
-
-	if [[ -f targets.picard ]]; then
-		args+=" TI=targets.picard AI=targets.picard"
-	fi
 	# Call Picard CollectMultipleMetrics. Requires the co-ordinate sorted BAM file given to the app
 	# as input. The file is referenced in this command with the option 'I=<input_file>'. Here, the
 	# downloaded BAM file path is accessed using the DNAnexus helper variable $sorted_bam_path.
 	# All outputs are saved to $output_dir (defined in main()) for upload to DNAnexus.
-	$java -jar /picard.jar CollectTargetedPcrMetrics $args
+	$java -jar /picard.jar CollectTargetedPcrMetrics  I="$sorted_bam_path" R=genome.fa \
+	O="$output_dir/$sorted_bam_prefix.targetPCRmetrics.txt" AI=targets.picard TI=targets.picard \
+	PER_TARGET_COVERAGE="$output_dir/$sorted_bam_prefix.perTargetCov.txt"
 }
 
 collect_multiple_metrics() {
@@ -62,20 +56,21 @@ collect_multiple_metrics() {
 
 collect_hs_metrics() {
 	echo "collect_hs_metrics"
-
-	args="I=$sorted_bam_path 
-	O=$output_dir/${sorted_bam_prefix}.hsmetrics.tsv R=genome.fa 
-	PER_TARGET_COVERAGE=$output_dir/${sorted_bam_prefix}.pertarget_coverage.tsv 
-	COVERAGE_CAP=100000"
-
-	if [[ -f targets.picard ]]; then
-		args+=" TI=targets.picard BI=targets.picard"
-	fi
-
 	# Call Picard CollectHsMetrics. Requires the co-ordinate sorted BAM file given to the app as
 	# input (I=). Outputs the hsmetrics.tsv and pertarget_coverage.tsv files to $output_dir
 	# (defined in main()) for upload to DNAnexus. Note that coverage cap is set to 100000 (default=200).
-	$java -jar /picard.jar CollectHsMetrics args
+	$java -jar /picard.jar CollectHsMetrics BI=targets.picard TI=targets.picard I="$sorted_bam_path" \
+	O="$output_dir/${sorted_bam_prefix}.hsmetrics.tsv" R=genome.fa \
+	PER_TARGET_COVERAGE="$output_dir/${sorted_bam_prefix}.pertarget_coverage.tsv" \
+	COVERAGE_CAP=100000
+}
+
+collect_wgs_metrics() {
+	echo "collect_wgs_metrics"
+	$java -jar /picard.jar CollectWgsMetrics \
+       I=$sorted_bam_path  \
+       O=$output_dir/${sorted_bam_prefix}.wgs_stats.tsv  \
+       R=genome.fa
 }
 
 main() {
@@ -99,7 +94,9 @@ mkdir -p $output_dir
 
 ##### MAIN #####
 
-if [[ "$bedfile_path" ]]; then
+if [[ "$run_CollectWgsMetrics" == true ]]; then
+collect_wgs_metrics
+else
 create_interval_file
 fi
 
@@ -122,7 +119,7 @@ collect_targeted_pcr_metrics
 fi
 
 # Catch all false
-if [[ "$run_CollectTargetedPcrMetrics" == false ]] && [[ "$run_CollectHsMetrics" == false ]] && [[ "$run_CollectMultipleMetrics" == false ]]; then
+if [[ "$run_CollectTargetedPcrMetrics" == false ]] && [[ "$run_CollectHsMetrics" == false ]] && [[ "$run_CollectMultipleMetrics" == false ]] && [[ "$run_CollectWgsMetrics" == false ]]; then
 echo "No picard functions selected!"
 fi
 
