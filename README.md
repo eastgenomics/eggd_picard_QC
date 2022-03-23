@@ -1,4 +1,4 @@
-# eggd Picard QC v1.0.0
+# eggd Picard QC v1.1.0
 ## What does this app do?
 This app runs modules from the Picard Tools suite (picard.jar v2.22.2 bundled in resources/) to generate quality-control (QC) statistics from mapped/aligned reads. Specifically, this app (for capture panels):
 * Calculates multiple summary statistic metrics for mapped reads (paired or unpaired) using Picard [CollectMultipleMetrics](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics).
@@ -52,6 +52,9 @@ Picard CollectHsMetrics output files:
 Picard TargetedPcrMetrics output files:
 * `*.targetPCRmetrics.txt` - A summary of the performance of the target amplicons
 * `*.perTargetCov.txt` - A per-amplicon summary of %GC and coverage.
+
+Picard CollectWgsMetrics output files:
+* `*.wgs_stats.tsv` - Stat summary about the alignment quality
 
 
 Detailed information about the metrics reported by all Picard suites can be found at the following page:
