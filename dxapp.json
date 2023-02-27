@@ -64,6 +64,15 @@
       "default": false,
       "group": "Picard functions",
       "optional": false
+    },
+    {
+      "name": "run_CollectRnaSeqMetrics",
+      "label": "Choose whether to run Picard CollectCollectRnaSeqMetrics",
+      "help": "Calculate RNAseq metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
+      "class": "boolean", 
+      "default": false,
+      "group": "Picard functions",
+      "optional": false
     }
   ],
   "outputSpec": [
