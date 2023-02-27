@@ -65,6 +65,24 @@ collect_hs_metrics() {
 	COVERAGE_CAP=100000
 }
 
+collect_rnaseq_metrics() {
+	echo "Gtf to Refflat"
+	# Make ref flat for the input genome
+	$java -jar GtftoRefflat-assembly-0.1.jar \
+	-g "$ref_annot_gtf_path" \
+	-r ref_annot.refflat
+
+	echo "collect_rnaseq_metrics"
+	# Call Picard CollectRnaSeqMetrics. akes a SAM/BAM file containing
+	# the aligned reads from an RNAseq experiment and produces metrics
+	# describing the distribution of the bases within the transcripts
+	$java -jar picard.jar CollectRnaSeqMetrics \
+      I="$sorted_bam_path" \
+      O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
+      REF_FLAT=ref_annot.refflat \
+      STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+}
+
 main() {
 
 ##### SETUP #####
@@ -105,6 +123,12 @@ fi
 if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
 # Call Picard CollectTargetedPcrMetrics
 collect_targeted_pcr_metrics
+fi
+
+# if CollectRnaSeqMetrics is true
+if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
+# Call Picard CollectRnaSeqMetrics
+collect_rnaseq_metrics
 fi
 
 # Catch all false
