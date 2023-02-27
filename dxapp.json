@@ -39,6 +39,14 @@
       "optional": true
     },
     {
+      "name": "ref_annot_gtf",
+      "label": "GTF to Ref flat jar",
+      "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
+      "class": "file",
+      "patterns": ["*.bed"],
+      "optional": true
+    },
+    {
       "name": "run_CollectMultipleMetrics",
       "label": "Choose whether to run Picard CollectMultipleMetrics",
       "help": "Specifically, run CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, MeanQualityByCycle, CollectBaseDistributionByCycle, CollectGcBiasMetrics, CollectQualityYieldMetrics. See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-",
