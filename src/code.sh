@@ -67,9 +67,15 @@ collect_hs_metrics() {
 
 collect_rnaseq_metrics() {
 	echo "Gtf to Refflat"
+	# Untar the genome file (CTAT) and move to new dirs
+	mkdir /home/dnanexus/reference_genome
+	mkdir /home/dnanexus/genome_lib
+	tar xvzf $ref_annot_gtf_path -C /home/dnanexus/genome_lib
+	ref_genome_fasta=$(find . -type f -name \*genome.fa)
+
 	# Make ref flat for the input genome
-	$java -jar GtftoRefflat-assembly-0.1.jar \
-	-g "$ref_annot_gtf_path" \
+	$java -jar $GtftoRefflat_jar \
+	-g $ref_genome_fasta \
 	-r ref_annot.refflat
 
 	echo "collect_rnaseq_metrics"
