@@ -1,7 +1,7 @@
 {
   "name": "eggd_picardqc_v1.1.0",
   "title": "eggd Picard QC v1.1.0",
-  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
+  "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
   "properties": {
     "github release": "v1.1.0"
   },
@@ -75,7 +75,7 @@
     },
     {
       "name": "run_CollectRnaSeqMetrics",
-      "label": "Choose whether to run Picard CollectCollectRnaSeqMetrics",
+      "label": "Choose whether to run Picard CollectRnaSeqMetrics",
       "help": "Calculate RNAseq metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
       "class": "boolean", 
       "default": false,
