@@ -1,9 +1,9 @@
 {
-  "name": "eggd_picardqc_v1.0.0",
-  "title": "eggd Picard QC v1.0.0",
+  "name": "eggd_picardqc_v1.1.0",
+  "title": "eggd Picard QC v1.1.0",
   "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
   "properties": {
-    "github release": "v1.0.0"
+    "github release": "v1.1.0"
   },
   "dxapi": "1.0.0",
   "inputSpec": [
