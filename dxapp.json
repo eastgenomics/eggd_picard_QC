@@ -39,11 +39,11 @@
       "optional": true
     },
     {
-      "name": "ref_annot_gtf",
+      "name": "GtftoRefflat_jar",
       "label": "GTF to Ref flat jar",
       "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
       "class": "file",
-      "patterns": ["*.bed"],
+      "patterns": ["*.jar"],
       "optional": true
     },
     {
