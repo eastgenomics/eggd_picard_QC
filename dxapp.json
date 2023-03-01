@@ -28,7 +28,7 @@
           "path": "/"
         }
       ],
-      "optional": false
+      "optional": true
     },
     {
       "name": "bedfile",
