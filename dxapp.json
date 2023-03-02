@@ -20,7 +20,7 @@
       "label": "Reference FASTA index archive",
       "help": "A gzipped tarball containing the reference genome files genome.fa, genome.fa.fai and genome.dict.",
       "class": "file",
-      "patterns": ["*.fasta-index.tar.gz"],
+      "patterns": ["*.tar.gz"],
       "suggestions": [
         {
           "name": "DNAnexus Apps Data (AWS Germany)",
@@ -28,7 +28,7 @@
           "path": "/"
         }
       ],
-      "optional": true
+      "optional": false
     },
     {
       "name": "bedfile",
