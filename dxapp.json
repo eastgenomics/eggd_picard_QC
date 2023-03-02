@@ -41,7 +41,7 @@
     {
       "name": "GtftoRefflat_jar",
       "label": "GTF to Ref flat jar",
-      "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
+      "help": "Converts a GTF file to a refflat file",
       "class": "file",
       "patterns": ["*.jar"],
       "optional": true
