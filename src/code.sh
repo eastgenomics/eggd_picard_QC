@@ -107,27 +107,24 @@ mkdir -p $output_dir
 
 ##### MAIN #####
 
+# Create the interval file if required
+[ "$run_CollectMultipleMetrics" == true ] || [ "$run_CollectHsMetrics" == true ] || [ "$run_CollectTargetedPcrMetrics" == true ]; then
+create_interval_file
 
 # if run_CollectMultipleMetrics is true
 if [[ "$run_CollectMultipleMetrics" == true ]]; then
-# Create the interval file
-create_interval_file
 # Call Picard CollectMultipleMetrics
 collect_multiple_metrics
 fi
 
 # if run_CollectHsMetrics is true
 if [[ "$run_CollectHsMetrics" == true ]]; then
-# Create the interval file
-create_interval_file
 # Call Picard CollectHSMetrics
 collect_hs_metrics
 fi
 
 # if run_CollectTargetedPcrMetrics is true
 if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-# Create the interval file
-create_interval_file
 # Call Picard CollectTargetedPcrMetrics
 collect_targeted_pcr_metrics
 fi
