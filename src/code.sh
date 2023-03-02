@@ -67,22 +67,19 @@ collect_hs_metrics() {
 
 collect_rnaseq_metrics() {
 	echo "Gtf to Refflat"
-	# Untar the genome file (CTAT) and move to new dirs
-	mkdir /home/dnanexus/reference_genome
-	mkdir /home/dnanexus/genome_lib
-	tar xvzf $ref_annot_gtf_path -C /home/dnanexus/genome_lib
-	ref_genome_fasta=$(find . -type f -name \*genome.fa)
+	# find genome file
+	ref_genome_gtf=$(find . -type f -name \*annot.gtf)
 
 	# Make ref flat for the input genome
-	$java -jar $GtftoRefflat_jar \
-	-g $ref_genome_fasta \
+	$java -jar $GtftoRefflat_jar_path \
+	-g $ref_genome_gtf \
 	-r ref_annot.refflat
 
 	echo "collect_rnaseq_metrics"
 	# Call Picard CollectRnaSeqMetrics. akes a SAM/BAM file containing
 	# the aligned reads from an RNAseq experiment and produces metrics
 	# describing the distribution of the bases within the transcripts
-	$java -jar picard.jar CollectRnaSeqMetrics \
+	$java -jar /picard.jar CollectRnaSeqMetrics \
       I="$sorted_bam_path" \
       O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
       REF_FLAT=ref_annot.refflat \
@@ -102,7 +99,7 @@ mem_in_mb=`head -n1 /proc/meminfo | awk '{print int($2*0.9/1024)}'`
 java="java -Xmx${mem_in_mb}m"
 
 # Unpack the reference genome for Picard. Produces genome.fa, genome.fa.fai, and genome.dict files.
-tar zxf $fasta_index_path
+tar zxvf $fasta_index_path
 
 # Create directory for Picard stats files to be uploaded from the worker
 output_dir=$HOME/out/eggd_picard_stats/QC
