@@ -65,6 +65,18 @@ collect_hs_metrics() {
 	COVERAGE_CAP=100000
 }
 
+collect_rnaseq_metrics() {
+	echo "collect_rnaseq_metrics"
+	# Call Picard CollectRnaSeqMetrics. akes a SAM/BAM file containing
+	# the aligned reads from an RNAseq experiment and produces metrics
+	# describing the distribution of the bases within the transcripts
+	$java -jar /picard.jar CollectRnaSeqMetrics \
+      I="$sorted_bam_path" \
+      O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
+      REF_FLAT=$ref_annot_refflat \
+      STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+}
+
 main() {
 
 ##### SETUP #####
@@ -78,7 +90,7 @@ mem_in_mb=`head -n1 /proc/meminfo | awk '{print int($2*0.9/1024)}'`
 java="java -Xmx${mem_in_mb}m"
 
 # Unpack the reference genome for Picard. Produces genome.fa, genome.fa.fai, and genome.dict files.
-tar zxf $fasta_index_path
+tar zxvf $fasta_index_path
 
 # Create directory for Picard stats files to be uploaded from the worker
 output_dir=$HOME/out/eggd_picard_stats/QC
@@ -86,7 +98,8 @@ mkdir -p $output_dir
 
 ##### MAIN #####
 
-# Create the interval file
+# Create the interval file if required
+[ "$run_CollectMultipleMetrics" == true ] || [ "$run_CollectHsMetrics" == true ] || [ "$run_CollectTargetedPcrMetrics" == true ]; then
 create_interval_file
 
 # if run_CollectMultipleMetrics is true
@@ -105,6 +118,12 @@ fi
 if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
 # Call Picard CollectTargetedPcrMetrics
 collect_targeted_pcr_metrics
+fi
+
+# if CollectRnaSeqMetrics is true
+if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
+# Call Picard CollectRnaSeqMetrics
+collect_rnaseq_metrics
 fi
 
 # Catch all false

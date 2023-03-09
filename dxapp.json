@@ -1,9 +1,9 @@
 {
-  "name": "eggd_picardqc_v1.0.0",
-  "title": "eggd Picard QC v1.0.0",
-  "summary": "v1.0.0 - Run Picard Tools suite for sequence QC: CollectMultipleMetrics and CollectHsMetrics",
+  "name": "eggd_picardqc_v1.2.0",
+  "title": "eggd Picard QC v1.2.0",
+  "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
   "properties": {
-    "github release": "v1.0.0"
+    "github release": "v1.2.0"
   },
   "dxapi": "1.0.0",
   "inputSpec": [
@@ -20,7 +20,7 @@
       "label": "Reference FASTA index archive",
       "help": "A gzipped tarball containing the reference genome files genome.fa, genome.fa.fai and genome.dict.",
       "class": "file",
-      "patterns": ["*.fasta-index.tar.gz"],
+      "patterns": ["*.tar.gz"],
       "suggestions": [
         {
           "name": "DNAnexus Apps Data (AWS Germany)",
@@ -36,6 +36,14 @@
       "help": "Choose manufacturer's bed file (for the enrichment kit) whose coordinates will be used to calculate the selection metrics.",
       "class": "file",
       "patterns": ["*.bed"],
+      "optional": true
+    },
+    {
+      "name": "ref_annot_refflat",
+      "label": "Ref flat file",
+      "help": "Ref flat file containing reference genes and transcript",
+      "class": "file",
+      "patterns": ["*.refflat"],
       "optional": true
     },
     {
@@ -60,6 +68,15 @@
       "name": "run_CollectTargetedPcrMetrics",
       "label": "Choose whether to run Picard CollectTargetedPcrMetrics",
       "help": "Calculate PCR-related metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
+      "class": "boolean", 
+      "default": false,
+      "group": "Picard functions",
+      "optional": false
+    },
+    {
+      "name": "run_CollectRnaSeqMetrics",
+      "label": "Choose whether to run Picard CollectRnaSeqMetrics",
+      "help": "Calculate RNAseq metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
       "class": "boolean", 
       "default": false,
       "group": "Picard functions",
