@@ -66,15 +66,6 @@ collect_hs_metrics() {
 }
 
 collect_rnaseq_metrics() {
-	echo "Gtf to Refflat"
-	# find genome file
-	ref_genome_gtf=$(find . -type f -name \*annot.gtf)
-
-	# Make ref flat for the input genome
-	$java -jar $GtftoRefflat_jar_path \
-	-g $ref_genome_gtf \
-	-r ref_annot.refflat
-
 	echo "collect_rnaseq_metrics"
 	# Call Picard CollectRnaSeqMetrics. akes a SAM/BAM file containing
 	# the aligned reads from an RNAseq experiment and produces metrics
@@ -82,7 +73,7 @@ collect_rnaseq_metrics() {
 	$java -jar /picard.jar CollectRnaSeqMetrics \
       I="$sorted_bam_path" \
       O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
-      REF_FLAT=ref_annot.refflat \
+      REF_FLAT=$ref_annot_refflat \
       STRAND=SECOND_READ_TRANSCRIPTION_STRAND
 }
 

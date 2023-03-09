@@ -39,11 +39,11 @@
       "optional": true
     },
     {
-      "name": "GtftoRefflat_jar",
-      "label": "GTF to Ref flat jar",
-      "help": "Converts a GTF file to a refflat file",
+      "name": "ref_annot_refflat",
+      "label": "Ref flat file",
+      "help": "Ref flat file containing reference genes and transcript",
       "class": "file",
-      "patterns": ["*.jar"],
+      "patterns": ["*.refflat"],
       "optional": true
     },
     {
