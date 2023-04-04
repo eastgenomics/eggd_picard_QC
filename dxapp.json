@@ -6,6 +6,12 @@
     "github release": "v1.2.0"
   },
   "dxapi": "1.0.0",
+  "authorizedUsers": [
+    "org-emee_1"
+  ],
+  "developers":[
+    "org-emee_1"
+  ],
   "inputSpec": [
     {
       "name": "sorted_bam",
@@ -107,6 +113,6 @@
     "file": "src/code.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
-    "release":"16.04"
+    "release":"20.04"
   }
 }
