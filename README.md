@@ -1,4 +1,4 @@
-# eggd Picard QC v1.0.0
+# eggd Picard QC 
 ## What does this app do?
 This app runs modules from the Picard Tools suite (picard.jar v2.22.2 bundled in resources/) to generate quality-control (QC) statistics from mapped/aligned reads. Specifically, this app (for capture panels):
 * Calculates multiple summary statistic metrics for mapped reads (paired or unpaired) using Picard [CollectMultipleMetrics](https://broadinstitute.github.io/picard/command-line-overview.html#CollectMultipleMetrics).
