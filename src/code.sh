@@ -99,8 +99,9 @@ mkdir -p $output_dir
 ##### MAIN #####
 
 # Create the interval file if required
-[ "$run_CollectMultipleMetrics" == true ] || [ "$run_CollectHsMetrics" == true ] || [ "$run_CollectTargetedPcrMetrics" == true ]; then
+if [ "$run_CollectMultipleMetrics" == true ] || [ "$run_CollectHsMetrics" == true ] || [ "$run_CollectTargetedPcrMetrics" == true ]; then
 create_interval_file
+fi
 
 # if run_CollectMultipleMetrics is true
 if [[ "$run_CollectMultipleMetrics" == true ]]; then
