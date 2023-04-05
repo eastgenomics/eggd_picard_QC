@@ -1,6 +1,6 @@
 {
-  "name": "eggd_picardqc_v1.2.0",
-  "title": "eggd Picard QC v1.2.0",
+  "name": "eggd_picard_QC",
+  "title": "eggd_picard_QC",
   "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
   "properties": {
     "github release": "v1.2.0"
