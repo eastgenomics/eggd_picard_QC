@@ -108,11 +108,17 @@
         "main": {
           "instanceType": "mem1_ssd1_x4"
         }
+      },
+    "timeoutPolicy": {
+        "*": {
+          "hours": 4
+        }
       }
     },
     "file": "src/code.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
-    "release":"20.04"
+    "release":"20.04",
+    "version": "0"
   }
 }
