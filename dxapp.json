@@ -1,10 +1,8 @@
 {
-  "name": "eggd_picardqc_v1.2.0",
-  "title": "eggd Picard QC v1.2.0",
+  "name": "eggd_picard_QC",
+  "title": "eggd_picard_QC",
   "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
-  "properties": {
-    "github release": "v1.2.0"
-  },
+  "version": "1.1.0",
   "dxapi": "1.0.0",
   "authorizedUsers": [
     "org-emee_1"
@@ -108,11 +106,17 @@
         "main": {
           "instanceType": "mem1_ssd1_x4"
         }
+      },
+    "timeoutPolicy": {
+        "*": {
+          "hours": 4
+        }
       }
     },
     "file": "src/code.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
-    "release":"20.04"
+    "release":"20.04",
+    "version": "0"
   }
 }
