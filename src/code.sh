@@ -73,7 +73,7 @@ collect_rnaseq_metrics() {
 	$java -jar /picard.jar CollectRnaSeqMetrics \
       I="$sorted_bam_path" \
       O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
-      REF_FLAT=$ref_annot_refflat \
+      REF_FLAT=$ref_annot_refflat_path \
       STRAND=SECOND_READ_TRANSCRIPTION_STRAND
 }
 
