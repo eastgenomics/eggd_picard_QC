@@ -70,7 +70,7 @@ collect_rnaseq_metrics() {
 	lib_dir=$(echo $fasta_index_name | cut -d "." -f 1)
 	ref_annot_gtf="/home/dnanexus/genome_lib/${lib_dir}/ctat_genome_lib_build_dir/ref_annot.gtf"
 	# conversion
-	$java -jar GtftoRefflat-assembly-0.1.jar \
+	$java -jar /GtftoRefflat-assembly-0.1.jar \
 	-g $ref_annot_gtf \
 	-r ${lib_dir}_ref_annot.refflat
 	echo "collect_rnaseq_metrics"
@@ -80,7 +80,7 @@ collect_rnaseq_metrics() {
 	$java -jar /picard.jar CollectRnaSeqMetrics \
       I="$sorted_bam_path" \
       O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
-      REF_FLAT=${lib_dir}_ref_annot.refflat \
+      REF_FLAT="${lib_dir}_ref_annot.refflat" \
       STRAND=SECOND_READ_TRANSCRIPTION_STRAND
 }
 
