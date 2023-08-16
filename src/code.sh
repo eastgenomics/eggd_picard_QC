@@ -67,8 +67,8 @@ collect_hs_metrics() {
 
 collect_rnaseq_metrics() {
 	echo "create refflat file from gtf file in CTAT bundle"
-	lib_dir=$(echo $fasta_index_name | cut -d "." -f 1)
-	ref_annot_gtf="/home/dnanexus/genome_lib/${lib_dir}/ctat_genome_lib_build_dir/ref_annot.gtf"
+	lib_dir=$(echo $fasta_index_name | cut -d "." -f 1,2)
+	ref_annot_gtf="/home/dnanexus/${lib_dir}/ctat_genome_lib_build_dir/ref_annot.gtf"
 	# conversion
 	$java -jar /GtftoRefflat-assembly-0.1.jar \
 	-g $ref_annot_gtf \
