@@ -71,10 +71,10 @@ collect_rnaseq_metrics() {
 	# the aligned reads from an RNAseq experiment and produces metrics
 	# describing the distribution of the bases within the transcripts
 	$java -jar /picard.jar CollectRnaSeqMetrics \
-      I="$sorted_bam_path" \
-      O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
-      REF_FLAT=$ref_annot_refflat_path \
-      STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+    I="$sorted_bam_path" \
+    O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
+    REF_FLAT="$ref_flat" \
+    STRAND=SECOND_READ_TRANSCRIPTION_STRAND
 }
 
 main() {
@@ -123,6 +123,19 @@ fi
 
 # if CollectRnaSeqMetrics is true
 if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
+# use ref flat file if provided else convert gtf to refl flat from gtf
+if [ -z "$ref_annot_refflat" ]; then # when there's NO refflat
+	echo "create refflat file from gtf file in CTAT bundle"
+	lib_dir=$(echo $fasta_index_name | cut -d "." -f 1,2)
+	ref_annot_gtf="/home/dnanexus/${lib_dir}/ctat_genome_lib_build_dir/ref_annot.gtf"
+	# conversion of gtf to ref flat file
+	$java -jar /GtftoRefflat-assembly-0.1.jar \
+	-g $ref_annot_gtf \
+	-r ${lib_dir}_ref_annot.refflat
+	ref_flat=${lib_dir}_ref_annot.refflat
+else
+	ref_flat=$ref_annot_refflat_path
+fi
 # Call Picard CollectRnaSeqMetrics
 collect_rnaseq_metrics
 fi
