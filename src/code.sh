@@ -4,6 +4,10 @@
 # and to output each line as it is executed -- useful for debugging
 set -e -x -o pipefail
 
+# err() - Output error messages to STDERR
+#
+# Arguments:
+#   $* - The error message to display
 err() {
     # Write error message to STDERR
     echo "$*" >&2
