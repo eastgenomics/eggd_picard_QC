@@ -110,7 +110,7 @@ main() {
     # Set java command with the calculated maximum memory usage
     java="java -Xmx${mem_in_mb}m"
 
-    tar zxvf $fasta_index_path
+    tar zxvf "$fasta_index_path"
     output_dir=$HOME/out/eggd_picard_stats/QC
     mkdir -p "$output_dir"
 
