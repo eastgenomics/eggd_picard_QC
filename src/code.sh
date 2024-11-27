@@ -97,7 +97,7 @@ main() {
     ## Sanity checks
     # Exit if no picard functions selected
     if [[ "$run_CollectTargetedPcrMetrics" == "false" ]] && \
-        [[ "$run_CollectTargetedPcrMetrics" == "false" ]] && \
+        [[ "$run_CollectHsMetrics" == "false" ]] && \
         [[ "$run_CollectMultipleMetrics" == "false" ]] && \
         [[ "$run_CollectRnaSeqMetrics" == "false" ]] && \
         [[ "$run_CollectVariantCallingMetrics" == "false" ]]; then
