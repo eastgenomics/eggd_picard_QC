@@ -20,7 +20,7 @@ err() {
 #   $1 - Path to BED file
 #   $2 - Path to sorted BAM file
 #   $3 - Output filename
-#   $3 - Java maximum heap size
+#   $4 - Java maximum heap size
 function create_interval_file() {
     local BEDFILE_PATH=$1
     local SORTED_BAM_PATH=$2
@@ -198,7 +198,7 @@ main() {
             echo "No refFlat file provided - creating GTF from refFlat file in CTAT bundle"
             LIB_DIR=$(echo $fasta_index_name | cut -d "." -f 1,2)
             REF_ANNOT_GTF="/home/dnanexus/${LIB_DIR}/ctat_genome_lib_build_dir/ref_annot.gtf"
-            java -Xmx -jar /GtftoRefflat-assembly-0.1.jar \
+            java -Xmx"${MEM_IN_MB}" -jar /GtftoRefflat-assembly-0.1.jar \
                 -g "${REF_ANNOT_GTF}" \
                 -r "${LIB_DIR}_ref_annot.refflat"
             REF_FLAT="${LIB_DIR}_ref_annot.refflat"
