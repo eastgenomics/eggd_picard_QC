@@ -165,7 +165,7 @@ main() {
 
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
-    MEM_IN_MB="$("${MEM}"/1024)m"
+    MEM_IN_MB="$(("${MEM}"/1024))m"
 
     tar zxvf "$fasta_index_path"
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
