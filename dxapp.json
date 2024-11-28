@@ -51,6 +51,22 @@
       "optional": true
     },
     {
+      "name": "vcf",
+      "label": "VCF",
+      "help": "VCF containing called variants",
+      "class": "file",
+      "patterns": ["*.vcf.gz"],
+      "optional": true
+    },
+    {
+      "name": "dbsnp_vcf",
+      "label": "dbSNP VCF",
+      "help": "VCF reference file containing dbSNP variants",
+      "class": "file",
+      "patterns": ["*.vcf.gz"],
+      "optional": true
+    },
+    {
       "name": "run_CollectMultipleMetrics",
       "label": "Choose whether to run Picard CollectMultipleMetrics",
       "help": "Specifically, run CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, MeanQualityByCycle, CollectBaseDistributionByCycle, CollectGcBiasMetrics, CollectQualityYieldMetrics. See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-",
