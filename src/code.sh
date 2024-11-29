@@ -148,6 +148,33 @@ collect_rnaseq_metrics() {
         -STRAND=SECOND_READ_TRANSCRIPTION_STRAND
 }
 
+# collect_variant_calling_metrics() - Collect variant calling metrics
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037057132-CollectVariantCallingMetrics-Picard for details
+#
+# Arguments:
+#   $1 - Path to VCF
+#   $2 - Path to dbSNP VCF
+#   $3 - Path to sequence dictionary file
+#   $4 - Path to output directory
+#   $5 - Java maximum heap size
+collect_variant_calling_metrics() {
+    local VCF=$1
+    local DBSNP_VCF=$2
+    local SEQ_DICT=$3
+    local OUTPUT_DIR=$4
+    local MAXHEAP=$5
+
+    local VCF_PREFIX
+    VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
+
+    java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
+        --DBSNP="${DBSNP_VCF}" \
+        --INPUT="${VCF}" \
+        --OUTPUT="${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
+        --SEQUENCE_DICTIONARY="${SEQ_DICT}" \
+        --GVCF_INPUT true
+}
+
 main() {
     ## Sanity checks
     # Exit if no picard functions selected
@@ -206,6 +233,10 @@ main() {
             REF_FLAT="${ref_annot_refflat_path}"
         fi
         collect_rnaseq_metrics "${sorted_bam_path}" "${REF_FLAT}" "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
+
+    if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
+        collect_variant_calling_metrics "${vcf_path}" "${dbsnp_vcf_path}" genome.dict "${OUTPUT_DIR}" "${MEM_IN_MB}"
     fi
 
     dx-upload-all-outputs --parallel
