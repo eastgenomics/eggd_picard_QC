@@ -190,9 +190,9 @@ main() {
     # Exit if input args don't align with selected functions
     if [[ ( "$run_CollectTargetedPcrMetrics" == "true" || \
             "$run_CollectHsMetrics" == "true" || \
-            "$run_CollectTargetedPcrMetrics" == "true" ) && \
+            "$run_CollectMultipleMetrics" == "true" ) && \
             ( -z "$sorted_bam" || -z "$fasta_index" || -z "$bedfile" ) ]] ; then
-        err "One of run_CollectTargetedPcrMetrics, run_CollectHsMetrics or run_CollectTargetedPcrMetrics was requested, but one of sorted_bam or fasta_index is missing. Exiting..."
+        err "One of run_CollectTargetedPcrMetrics, run_CollectHsMetrics or run_CollectMultipleMetrics was requested, but one or more of sorted_bam, fasta_index or bedfile are missing. Exiting..."
         exit 1
     fi
 
@@ -203,7 +203,7 @@ main() {
 
     if [[ "$run_CollectVariantCallingMetrics" == "true" && \
         ( -z "$vcf" || -z "$dbsnp_vcf" ) ]]; then
-        err "run_CollectVariantCallingMetrics was requested, but one of vcf, dbsnp_vcf, or bedfile are missing. Exiting..."
+        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
         exit 1
     fi
 
