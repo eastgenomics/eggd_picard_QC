@@ -187,6 +187,26 @@ main() {
         exit 1
     fi
 
+    # Exit if input args don't align with selected functions
+    if [[ ( "$run_CollectTargetedPcrMetrics" == "true" || \
+            "$run_CollectHsMetrics" == "true" || \
+            "$run_CollectTargetedPcrMetrics" == "true" ) && \
+            ( -z "$sorted_bam" || -z "$fasta_index" || -z "$bedfile" ) ]] ; then
+        err "One of run_CollectTargetedPcrMetrics, run_CollectHsMetrics or run_CollectTargetedPcrMetrics was requested, but one of sorted_bam or fasta_index is missing. Exiting..."
+        exit 1
+    fi
+
+    if [[ "$run_CollectRnaSeqMetrics" == "true" && -z "$sorted_bam" ]]; then
+        err "run_CollectRnaSeqMetrics was requested, but sorted_bam is missing. Exiting..."
+        exit 1
+    fi
+
+    if [[ "$run_CollectVariantCallingMetrics" == "true" && \
+        ( -z "$vcf" || -z "$dbsnp_vcf" ) ]]; then
+        err "run_CollectVariantCallingMetrics was requested, but one of vcf, dbsnp_vcf, or bedfile are missing. Exiting..."
+        exit 1
+    fi
+
     ## Setup 
     dx-download-all-inputs
 
