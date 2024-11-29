@@ -2,7 +2,7 @@
   "name": "eggd_picard_QC",
   "title": "eggd_picard_QC",
   "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
-  "version": "1.1.0",
+  "version": "2.3.0",
   "dxapi": "1.0.0",
   "authorizedUsers": [
     "org-emee_1"
@@ -17,7 +17,7 @@
       "help": "An input BAM file for deduplicating and/or Picard Tools QC suites",
       "class": "file",
       "patterns": ["*.bam"],
-      "optional": false
+      "optional": true 
     },
     {
       "name": "fasta_index",
@@ -32,7 +32,7 @@
           "path": "/"
         }
       ],
-      "optional": false
+      "optional": true
     },
     {
       "name": "bedfile",
