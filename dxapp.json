@@ -107,7 +107,7 @@
       "label": "Choose whether to run Picard CollectVariantCallingMetrics",
       "help": "Calculate variant calling metrics from a compressed VCF. https://gatk.broadinstitute.org/hc/en-us/articles/360037057132-CollectVariantCallingMetrics-Picard",
       "class": "boolean",
-      "default": "false",
+      "default": false,
       "group": "Picard functions",
       "optional": false
     }
