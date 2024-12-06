@@ -138,7 +138,7 @@
         }
       }
     },
-    "file": "src/code.sh",
+    "file": "src/script.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
     "release":"20.04",
