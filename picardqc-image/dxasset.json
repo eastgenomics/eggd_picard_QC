@@ -1,0 +1,9 @@
+{
+  "name": "picardqc-image",
+  "title": "picardQC image",
+  "description": "Docker image containing picard v3.3.0 and GtftoRefflat-assembly-0.1",
+  "version": "1.2.0",
+  "distribution": "Ubuntu",
+  "instanceType": "mem2_ssd1_x4",
+  "release": "20.04"
+}
