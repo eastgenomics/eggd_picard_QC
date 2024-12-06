@@ -4,149 +4,260 @@
 # and to output each line as it is executed -- useful for debugging
 set -e -x -o pipefail
 
-create_interval_file() {
-	echo "create_interval_file"
-	# Converts a BED file to a Picard Interval List
-	# See https://gatk.broadinstitute.org/hc/en-us/articles/360037593251-BedToIntervalList-Picard-
-	# Note that SD can take any of the follow. Here we are using the BAM.
-	# - A file with .dict extension generated using Picard's CreateSequenceDictionaryTool
-	# - A reference.fa or reference.fasta file with a reference.dict in the same directory
-	# - Another IntervalList with @SQ lines in the header from which to generate a dictionary
-	# - A VCF that contains #contig lines from which to generate a sequence dictionary
-	# - A SAM or BAM file with @SQ lines in the header from which to generate a dictionary
-	$java -jar /picard.jar BedToIntervalList \
-	I="$bedfile_path" \
-	O=targets.picard \
-	SD="$sorted_bam_path"
+# err() - Output error messages to STDERR
+#
+# Arguments:
+#   $* - The error message to display
+err() {
+    # Write error message to STDERR
+    echo "$*" >&2
 }
 
+# create_interval_file() - Converts a BED file to a Picard Interval List. 
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037593251-BedToIntervalList-Picard for details
+#
+# Arguments:
+#   $1 - Path to BED file
+#   $2 - Path to sorted BAM file
+#   $3 - Output filename
+#   $4 - Java maximum heap size
+function create_interval_file() {
+    local BEDFILE_PATH=$1
+    local SORTED_BAM_PATH=$2
+    local OUTPUT_TARGETS=$3
+    local MAXHEAP=$4
+
+	java -Xmx"${MAXHEAP}" -jar /picard.jar BedToIntervalList \
+	    -I="${BEDFILE_PATH}" \
+	    -O="${OUTPUT_TARGETS}" \
+	    -SD="${SORTED_BAM_PATH}"
+}
+
+# collect_targeted_pcr_metrics() - Collects targeted PCR metrics
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037438131-CollectTargetedPcrMetrics-Picard for details 
+#
+# Arguments:
+#   $1 - Path to sorted BAM file
+#   $2 - Path to reference genome
+#   $3 - Path to picard interval list
+#   $4 - Path to output directory
+#   $5 - Java maximum heap size
 collect_targeted_pcr_metrics() {
-	echo "collect_targeted_pcr_metrics"
-	# Call Picard CollectMultipleMetrics. Requires the co-ordinate sorted BAM file given to the app
-	# as input. The file is referenced in this command with the option 'I=<input_file>'. Here, the
-	# downloaded BAM file path is accessed using the DNAnexus helper variable $sorted_bam_path.
-	# All outputs are saved to $output_dir (defined in main()) for upload to DNAnexus.
-	$java -jar /picard.jar CollectTargetedPcrMetrics  I="$sorted_bam_path" R=genome.fa \
-	O="$output_dir/$sorted_bam_prefix.targetPCRmetrics.txt" AI=targets.picard TI=targets.picard \
-	PER_TARGET_COVERAGE="$output_dir/$sorted_bam_prefix.perTargetCov.txt"
+    local SORTED_BAM_PATH=$1
+    local REF_GENOME=$2
+    local TARGETS_FILE=$3
+    local OUTPUT_DIR=$4
+    local MAXHEAP=$5
+
+    local SORTED_BAM_PREFIX
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+
+	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectTargetedPcrMetrics  \
+        -I="${SORTED_BAM_PATH}" \
+        -R="${REF_GENOME}" \
+	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
+        -AI="${TARGETS_FILE}" \
+        -TI="${TARGETS_FILE}" \
+        --PER_TARGET_COVERAGE="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.perTargetCov.txt"
 }
 
+# collect_multiple_metrics() - Collected multiple metrics. Note that not all outputs are relevant for all type of sequencing.
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard for details
+#
+# Arguments:
+#   $1 - Path to sorted BAM file
+#   $2 - Path to reference genome
+#   $3 - Path to output directory
+#   $4 - Java maximum heap size
+#
+# TODO: Investigate CollectSequencingArtifactMetrics - it errors out with TSO500 BAMs due to
+# "Record contains library that is missing from header", and so is not used (fix unclear)
 collect_multiple_metrics() {
-	echo "collect_multiple_metrics"
-	# Call Picard CollectMultipleMetrics. Requires the co-ordinate sorted BAM file given to the app
-	# as input. The file is referenced in this command with the option 'I=<input_file>'. Here, the
-	# downloaded BAM file path is accessed using the DNAnexus helper variable $sorted_bam_path.
-	# All outputs are saved to $output_dir (defined in main()) for upload to DNAnexus.
-	# Note that not all outputs are relevent for all types of sequencing
-	# e.g. some aren't applicable for amplicon NGC
-	# Note that CollectSequencingArtifactMetrics errors out with TSO500 BAMs due to 
-	# "Record contains library that is missing from header" and so not used (fix unclear)
-	$java -jar /picard.jar CollectMultipleMetrics I="$sorted_bam_path" R=genome.fa \
-	PROGRAM=null \
-	PROGRAM=CollectAlignmentSummaryMetrics \
-	PROGRAM=CollectInsertSizeMetrics \
-	PROGRAM=QualityScoreDistribution \
-	PROGRAM=MeanQualityByCycle \
-	PROGRAM=CollectBaseDistributionByCycle \
-	PROGRAM=CollectGcBiasMetrics \
-	PROGRAM=CollectQualityYieldMetrics \
-	O="$output_dir/$sorted_bam_prefix"
-	# PROGRAM=CollectSequencingArtifactMetrics \
+    local SORTED_BAM_PATH=$1
+    local REF_GENOME=$2
+    local OUTPUT_DIR=$3
+    local MAXHEAP=$4
+
+    local SORTED_BAM_PREFIX
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+
+	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectMultipleMetrics \
+        -I="${SORTED_BAM_PATH}" \
+        -R="${REF_GENOME}" \
+	    --PROGRAM=null \
+	    --PROGRAM=CollectAlignmentSummaryMetrics \
+	    --PROGRAM=CollectInsertSizeMetrics \
+	    --PROGRAM=QualityScoreDistribution \
+	    --PROGRAM=MeanQualityByCycle \
+	    --PROGRAM=CollectBaseDistributionByCycle \
+	    --PROGRAM=CollectGcBiasMetrics \
+	    --PROGRAM=CollectQualityYieldMetrics \
+	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}"
 }
 
+# collect_hs_metrics() - Collect hybrid-selection (HS) metrics.
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard for details
+#
+# Arguments:
+#   $1 - Path to sorted BAM file
+#   $2 - Path to targets file
+#   $3 - Path to reference genome
+#   $4 - Path to output directory
+#   $5 - Java maximum heap size
 collect_hs_metrics() {
-	echo "collect_hs_metrics"
-	# Call Picard CollectHsMetrics. Requires the co-ordinate sorted BAM file given to the app as
-	# input (I=). Outputs the hsmetrics.tsv and pertarget_coverage.tsv files to $output_dir
-	# (defined in main()) for upload to DNAnexus. Note that coverage cap is set to 100000 (default=200).
-	$java -jar /picard.jar CollectHsMetrics BI=targets.picard TI=targets.picard I="$sorted_bam_path" \
-	O="$output_dir/${sorted_bam_prefix}.hsmetrics.tsv" R=genome.fa \
-	PER_TARGET_COVERAGE="$output_dir/${sorted_bam_prefix}.pertarget_coverage.tsv" \
-	COVERAGE_CAP=100000
+    local SORTED_BAM_PATH=$1
+    local TARGETS_FILE=$2
+    local REF_GENOME=$3
+    local OUTPUT_DIR=$4
+    local MAXHEAP=$5
+
+    local SORTED_BAM_PREFIX
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+
+	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectHsMetrics \
+        --BI="${TARGETS_FILE}" \
+        --TI="${TARGETS_FILE}" \
+        --I="${SORTED_BAM_PATH}" \
+        --O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
+        --R="${REF_GENOME}" \
+        --PER_TARGET_COVERAGE="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv"\
+        --COVERAGE_CAP=100000
 }
 
+# collect_rnaseq_metrics() - Collect RNA-seq metrics
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037057492-CollectRnaSeqMetrics-Picard for details
+#
+# Arguments:
+#   $1 - Path to sorted BAM file
+#   $2 - Path to refFlat file
+#   $3 - Path to output directory
+#   $4 - Java maximum heap size
 collect_rnaseq_metrics() {
-	echo "collect_rnaseq_metrics"
-	# Call Picard CollectRnaSeqMetrics. akes a SAM/BAM file containing
-	# the aligned reads from an RNAseq experiment and produces metrics
-	# describing the distribution of the bases within the transcripts
-	$java -jar /picard.jar CollectRnaSeqMetrics \
-    I="$sorted_bam_path" \
-    O="$output_dir/${sorted_bam_prefix}.RNAmetrics.tsv" \
-    REF_FLAT="$ref_flat" \
-    STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+    local SORTED_BAM_PATH=$1
+    local REF_FLAT=$2
+    local OUTPUT_DIR=$3
+    local MAXHEAP=$4
+
+    local SORTED_BAM_PREFIX
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+
+	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectRnaSeqMetrics \
+        -I="${SORTED_BAM_PATH}" \
+        -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
+        --REF_FLAT="${REF_FLAT}" \
+        -STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+}
+
+# collect_variant_calling_metrics() - Collect variant calling metrics
+# See https://gatk.broadinstitute.org/hc/en-us/articles/360037057132-CollectVariantCallingMetrics-Picard for details
+#
+# Arguments:
+#   $1 - Path to VCF
+#   $2 - Path to dbSNP VCF
+#   $3 - Path to sequence dictionary file
+#   $4 - Path to output directory
+#   $5 - Java maximum heap size
+collect_variant_calling_metrics() {
+    local VCF=$1
+    local DBSNP_VCF=$2
+    local SEQ_DICT=$3
+    local OUTPUT_DIR=$4
+    local MAXHEAP=$5
+
+    local VCF_PREFIX
+    VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
+
+    java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
+        --DBSNP="${DBSNP_VCF}" \
+        --INPUT="${VCF}" \
+        --OUTPUT="${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
+        --SEQUENCE_DICTIONARY="${SEQ_DICT}" \
+        --GVCF_INPUT true
 }
 
 main() {
+    ## Sanity checks
+    # Exit if no picard functions selected
+    if [[ "$run_CollectTargetedPcrMetrics" == "false" ]] && \
+        [[ "$run_CollectHsMetrics" == "false" ]] && \
+        [[ "$run_CollectMultipleMetrics" == "false" ]] && \
+        [[ "$run_CollectRnaSeqMetrics" == "false" ]] && \
+        [[ "$run_CollectVariantCallingMetrics" == "false" ]]; then
+        err "No picard functions selected!"
+        exit 1
+    fi
 
-##### SETUP #####
+    # Exit if input args don't align with selected functions
+    if [[ ( "$run_CollectTargetedPcrMetrics" == "true" || \
+            "$run_CollectHsMetrics" == "true" || \
+            "$run_CollectMultipleMetrics" == "true" ) && \
+            ( -z "$sorted_bam" || -z "$fasta_index" || -z "$bedfile" ) ]] ; then
+        err "One of run_CollectTargetedPcrMetrics, run_CollectHsMetrics or run_CollectMultipleMetrics was requested, but one or more of sorted_bam, fasta_index or bedfile are missing. Exiting..."
+        exit 1
+    fi
 
-# Download input files from inputSpec to ~/in/. Allows the use of DNA Nexus bash helper variables.
-dx-download-all-inputs
+    if [[ "$run_CollectRnaSeqMetrics" == "true" && -z "$sorted_bam" ]]; then
+        err "run_CollectRnaSeqMetrics was requested, but sorted_bam is missing. Exiting..."
+        exit 1
+    fi
 
-# Calculate 90% of memory size for java
-mem_in_mb=`head -n1 /proc/meminfo | awk '{print int($2*0.9/1024)}'`
-# Set java command with the calculated maximum memory usage
-java="java -Xmx${mem_in_mb}m"
+    if [[ "$run_CollectVariantCallingMetrics" == "true" && \
+        ( -z "$vcf" || -z "$dbsnp_vcf" ) ]]; then
+        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
+        exit 1
+    fi
 
-# Unpack the reference genome for Picard. Produces genome.fa, genome.fa.fai, and genome.dict files.
-tar zxvf $fasta_index_path
+    ## Setup 
+    dx-download-all-inputs
 
-# Create directory for Picard stats files to be uploaded from the worker
-output_dir=$HOME/out/eggd_picard_stats/QC
-mkdir -p $output_dir
+    # Calculate 90% of memory size for java
+    MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
+    MEM_IN_MB="$(("${MEM}"/1024))m"
 
-##### MAIN #####
+    tar zxvf "$fasta_index_path"
+    OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
+    mkdir -p "$OUTPUT_DIR"
 
-# Create the interval file if required
-if [ "$run_CollectMultipleMetrics" == true ] || [ "$run_CollectHsMetrics" == true ] || [ "$run_CollectTargetedPcrMetrics" == true ]; then
-create_interval_file
-fi
+    # Create the interval file if required
+    if [[ "$run_CollectMultipleMetrics" == true ]] || \
+        [[ "$run_CollectHsMetrics" == true ]] || \
+        [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
+        echo "Generating interval file"
+        create_interval_file "${bedfile_path}" "${sorted_bam_path}" targets.picard "${MEM_IN_MB}"
+    fi
 
-# if run_CollectMultipleMetrics is true
-if [[ "$run_CollectMultipleMetrics" == true ]]; then
-# Call Picard CollectMultipleMetrics
-collect_multiple_metrics
-fi
+    ## Run picard commands
+    if [[ "$run_CollectMultipleMetrics" == true ]]; then
+        collect_multiple_metrics "${sorted_bam_path}" "${REF_GENOME}" "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
 
-# if run_CollectHsMetrics is true
-if [[ "$run_CollectHsMetrics" == true ]]; then
-# Call Picard CollectHSMetrics
-collect_hs_metrics
-fi
+    if [[ "$run_CollectHsMetrics" == true ]]; then
+        collect_hs_metrics "${sorted_bam_path}" targets.picard genome.fa "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
 
-# if run_CollectTargetedPcrMetrics is true
-if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-# Call Picard CollectTargetedPcrMetrics
-collect_targeted_pcr_metrics
-fi
+    if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
+        collect_targeted_pcr_metrics "${sorted_bam_path}" genome.fa targets.picard "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
 
-# if CollectRnaSeqMetrics is true
-if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-# use ref flat file if provided else convert gtf to refl flat from gtf
-if [ -z "$ref_annot_refflat" ]; then # when there's NO refflat
-	echo "create refflat file from gtf file in CTAT bundle"
-	lib_dir=$(echo $fasta_index_name | cut -d "." -f 1,2)
-	ref_annot_gtf="/home/dnanexus/${lib_dir}/ctat_genome_lib_build_dir/ref_annot.gtf"
-	# conversion of gtf to ref flat file
-	$java -jar /GtftoRefflat-assembly-0.1.jar \
-	-g $ref_annot_gtf \
-	-r ${lib_dir}_ref_annot.refflat
-	ref_flat=${lib_dir}_ref_annot.refflat
-else
-	ref_flat=$ref_annot_refflat_path
-fi
-# Call Picard CollectRnaSeqMetrics
-collect_rnaseq_metrics
-fi
+    if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
+        # Create refFlat file if not provided by user
+        if [ -z "$ref_annot_refflat" ]; then
+            echo "No refFlat file provided - creating GTF from refFlat file in CTAT bundle"
+            LIB_DIR=$(echo $fasta_index_name | cut -d "." -f 1,2)
+            REF_ANNOT_GTF="/home/dnanexus/${LIB_DIR}/ctat_genome_lib_build_dir/ref_annot.gtf"
+            java -Xmx"${MEM_IN_MB}" -jar /GtftoRefflat-assembly-0.1.jar \
+                -g "${REF_ANNOT_GTF}" \
+                -r "${LIB_DIR}_ref_annot.refflat"
+            REF_FLAT="${LIB_DIR}_ref_annot.refflat"
+        else
+            REF_FLAT="${ref_annot_refflat_path}"
+        fi
+        collect_rnaseq_metrics "${sorted_bam_path}" "${REF_FLAT}" "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
 
-# Catch all false
-if [[ "$run_CollectTargetedPcrMetrics" == false ]] && [[ "$run_CollectHsMetrics" == false ]] && [[ "$run_CollectMultipleMetrics" == false ]]; then
-echo "No picard functions selected!"
-fi
+    if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
+        collect_variant_calling_metrics "${vcf_path}" "${dbsnp_vcf_path}" genome.dict "${OUTPUT_DIR}" "${MEM_IN_MB}"
+    fi
 
-##### CLEAN UP #####
-
-# Upload all results files and directories in $HOME/out/eggd_picard_stats/
-dx-upload-all-outputs --parallel
+    dx-upload-all-outputs --parallel
 }

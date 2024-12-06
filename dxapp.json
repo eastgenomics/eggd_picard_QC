@@ -2,7 +2,7 @@
   "name": "eggd_picard_QC",
   "title": "eggd_picard_QC",
   "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "dxapi": "1.0.0",
   "authorizedUsers": [
     "org-emee_1"
@@ -17,7 +17,7 @@
       "help": "An input BAM file for deduplicating and/or Picard Tools QC suites",
       "class": "file",
       "patterns": ["*.bam"],
-      "optional": false
+      "optional": true 
     },
     {
       "name": "fasta_index",
@@ -32,7 +32,7 @@
           "path": "/"
         }
       ],
-      "optional": false
+      "optional": true
     },
     {
       "name": "bedfile",
@@ -48,6 +48,22 @@
       "help": "Ref flat file containing reference genes and transcript",
       "class": "file",
       "patterns": ["*.refflat"],
+      "optional": true
+    },
+    {
+      "name": "vcf",
+      "label": "VCF",
+      "help": "VCF containing called variants",
+      "class": "file",
+      "patterns": ["*.vcf.gz"],
+      "optional": true
+    },
+    {
+      "name": "dbsnp_vcf",
+      "label": "dbSNP VCF",
+      "help": "VCF reference file containing dbSNP variants",
+      "class": "file",
+      "patterns": ["*.vcf.gz"],
       "optional": true
     },
     {
@@ -82,6 +98,15 @@
       "label": "Choose whether to run Picard CollectRnaSeqMetrics",
       "help": "Calculate RNAseq metrics from targeted sequencing data. https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectTargetedPcrMetrics-Picard-",
       "class": "boolean", 
+      "default": false,
+      "group": "Picard functions",
+      "optional": false
+    },
+    {
+      "name": "run_CollectVariantCallingMetrics",
+      "label": "Choose whether to run Picard CollectVariantCallingMetrics",
+      "help": "Calculate variant calling metrics from a compressed VCF. https://gatk.broadinstitute.org/hc/en-us/articles/360037057132-CollectVariantCallingMetrics-Picard",
+      "class": "boolean",
       "default": false,
       "group": "Picard functions",
       "optional": false
