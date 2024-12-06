@@ -121,10 +121,10 @@
     }
   ],
   "runSpec": {
-    "execDepends": [
-      {
-        "name": "openjdk-8-jre-headless"
-      }
+    "assetDepends": [
+        {
+            "id": "record-Gx9Xpp84jvk540yp7QgKqJ89"
+        }
     ],
     "systemRequirementsByRegion": {
       "aws:eu-central-1": {
