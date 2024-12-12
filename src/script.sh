@@ -239,8 +239,8 @@ main() {
     # Start container process in background, and use docker exec to run multiple commands.
     # This is because we need the docker container to persist between steps
     ## note that mount point for GTF needs to be made first
-    FASTA_INDEX_NAME=$(basename $fasta_index .tar.gz)
-    CTAT_LIBDIR="/home/dnanexus/${FASTA_INDEX_NAME}/ctat_genome_lib_build_dir"
+    GENOME_BUILD_NAME=$(basename $fasta_index_name .tar.gz)
+    CTAT_LIBDIR="/home/dnanexus/${GENOME_BUILD_NAME}/ctat_genome_lib_build_dir"
 
     DOCKER_IMAGENAME=$(find /image -name "*.tar.gz")
     sudo docker load -i "${DOCKER_IMAGENAME}"
@@ -278,8 +278,8 @@ main() {
         # Create refFlat file if not provided by user
         if [ -z "$ref_annot_refflat" ]; then
             echo "No refFlat file provided - creating GTF from refFlat file in CTAT bundle"
-            REF_FLAT="${FASTA_INDEX_NAME}_ref_annot.refflat"
-            OUTPUT_FILE="${OUTPUT_DIR}/${FASTA_INDEX_NAME}_ref_annot.refflat"
+            REF_FLAT="${GENOME_BUILD_NAME}_ref_annot.refflat"
+            OUTPUT_FILE="${OUTPUT_DIR}/${GENOME_BUILD_NAME}_ref_annot.refflat"
             make_refflat "/ctat_libdir/ref_annot.gtf" "/in/${REF_FLAT}" "${MEM_IN_MB}"
         else
             REF_FLAT="${ref_annot_refflat_name}"
