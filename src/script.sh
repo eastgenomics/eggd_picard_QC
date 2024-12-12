@@ -23,14 +23,14 @@ err() {
 #   $4 - Java maximum heap size
 function create_interval_file() {
     local BEDFILE_PATH=$1
-    local SORTED_BAM_PATH=$2
+    local SORTED_BAM=$2
     local OUTPUT_TARGETS=$3
     local MAXHEAP=$4
 
-	java -Xmx"${MAXHEAP}" -jar /picard.jar BedToIntervalList \
+	docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar BedToIntervalList \
 	    -I="${BEDFILE_PATH}" \
 	    -O="${OUTPUT_TARGETS}" \
-	    -SD="${SORTED_BAM_PATH}"
+	    -SD="${SORTED_BAM}"
 }
 
 # collect_targeted_pcr_metrics() - Collects targeted PCR metrics
@@ -43,17 +43,17 @@ function create_interval_file() {
 #   $4 - Path to output directory
 #   $5 - Java maximum heap size
 collect_targeted_pcr_metrics() {
-    local SORTED_BAM_PATH=$1
+    local SORTED_BAM=$1
     local REF_GENOME=$2
     local TARGETS_FILE=$3
     local OUTPUT_DIR=$4
     local MAXHEAP=$5
 
     local SORTED_BAM_PREFIX
-    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectTargetedPcrMetrics  \
-        -I="${SORTED_BAM_PATH}" \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectTargetedPcrMetrics  \
+        -I="${SORTED_BAM}" \
         -R="${REF_GENOME}" \
 	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
         -AI="${TARGETS_FILE}" \
@@ -73,16 +73,16 @@ collect_targeted_pcr_metrics() {
 # TODO: Investigate CollectSequencingArtifactMetrics - it errors out with TSO500 BAMs due to
 # "Record contains library that is missing from header", and so is not used (fix unclear)
 collect_multiple_metrics() {
-    local SORTED_BAM_PATH=$1
+    local SORTED_BAM=$1
     local REF_GENOME=$2
     local OUTPUT_DIR=$3
     local MAXHEAP=$4
 
     local SORTED_BAM_PREFIX
-    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectMultipleMetrics \
-        -I="${SORTED_BAM_PATH}" \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectMultipleMetrics \
+        -I="${SORTED_BAM}" \
         -R="${REF_GENOME}" \
 	    --PROGRAM=null \
 	    --PROGRAM=CollectAlignmentSummaryMetrics \
@@ -105,19 +105,19 @@ collect_multiple_metrics() {
 #   $4 - Path to output directory
 #   $5 - Java maximum heap size
 collect_hs_metrics() {
-    local SORTED_BAM_PATH=$1
+    local SORTED_BAM=$1
     local TARGETS_FILE=$2
     local REF_GENOME=$3
     local OUTPUT_DIR=$4
     local MAXHEAP=$5
 
     local SORTED_BAM_PREFIX
-    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectHsMetrics \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectHsMetrics \
         --BI="${TARGETS_FILE}" \
         --TI="${TARGETS_FILE}" \
-        --I="${SORTED_BAM_PATH}" \
+        --I="${SORTED_BAM}" \
         --O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
         --R="${REF_GENOME}" \
         --PER_TARGET_COVERAGE="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv"\
@@ -133,16 +133,16 @@ collect_hs_metrics() {
 #   $3 - Path to output directory
 #   $4 - Java maximum heap size
 collect_rnaseq_metrics() {
-    local SORTED_BAM_PATH=$1
+    local SORTED_BAM=$1
     local REF_FLAT=$2
     local OUTPUT_DIR=$3
     local MAXHEAP=$4
 
     local SORTED_BAM_PREFIX
-    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM_PATH}" .bam)
+    SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-	java -Xmx"${MAXHEAP}" -jar /picard.jar CollectRnaSeqMetrics \
-        -I="${SORTED_BAM_PATH}" \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectRnaSeqMetrics \
+        -I="${SORTED_BAM}" \
         -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
         --REF_FLAT="${REF_FLAT}" \
         -STRAND=SECOND_READ_TRANSCRIPTION_STRAND
@@ -167,12 +167,29 @@ collect_variant_calling_metrics() {
     local VCF_PREFIX
     VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
 
-    java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
         --DBSNP="${DBSNP_VCF}" \
         --INPUT="${VCF}" \
         --OUTPUT="${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
         --SEQUENCE_DICTIONARY="${SEQ_DICT}" \
         --GVCF_INPUT true
+}
+
+# make_refflat() - generates refFlat file 
+# See https://biopet.github.io/gtftorefflat/develop/ for details
+#
+# Arguments:
+#   $1 - path to input GTF
+#   $2 - path to output refFlat file
+#   $3 - Java maximum heap size
+make_refflat() {
+    local GTF=$1
+    local OUTPUT_REFFLAT=$2
+    local MAXHEAP=$3
+
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/bin/GtftoRefflat-assembly-0.1.jar \
+        -g "${GTF}" \
+        -r "${OUTPUT_REFFLAT}"
 }
 
 main() {
@@ -208,55 +225,70 @@ main() {
     fi
 
     ## Setup 
+    ### puts inputs in /home/dnanexus/in/
     dx-download-all-inputs
 
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
     MEM_IN_MB="$(("${MEM}"/1024))m"
 
-    tar zxvf "$fasta_index_path"
+    tar zxvf "$fasta_index_path" -C in/ 
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
     mkdir -p "$OUTPUT_DIR"
+
+    # Start container process in background, and use docker exec to run multiple commands.
+    # This is because we need the docker container to persist between steps
+    ## note that mount point for GTF needs to be made first
+    FASTA_INDEX_NAME=$(basename $fasta_index .tar.gz)
+    CTAT_LIBDIR="/home/dnanexus/${FASTA_INDEX_NAME}/ctat_genome_lib_build_dir"
+
+    DOCKER_IMAGENAME=$(find /image -name "*.tar.gz")
+    sudo docker load -i "${DOCKER_IMAGENAME}"
+    DOCKER_IMAGE=$(docker image ls -q)
+    docker run \
+        --name picard_image \
+        --mount type=bind,source=/home/dnanexus/in/,target=/in \
+        --mount type=bind,source="${CTAT_LIBDIR}",target=/ctat_libdir \
+        --mount type=bind,source="${OUTPUT_DIR}",target=/out \
+        --entrypoint /bin/bash \
+        -itd "${DOCKER_IMAGE}"
 
     # Create the interval file if required
     if [[ "$run_CollectMultipleMetrics" == true ]] || \
         [[ "$run_CollectHsMetrics" == true ]] || \
         [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
         echo "Generating interval file"
-        create_interval_file "${bedfile_path}" "${sorted_bam_path}" targets.picard "${MEM_IN_MB}"
+        create_interval_file "/in/${bedfile_name}" "/in/${sorted_bam_name}" "/in/targets.picard" "${MEM_IN_MB}"
     fi
 
     ## Run picard commands
     if [[ "$run_CollectMultipleMetrics" == true ]]; then
-        collect_multiple_metrics "${sorted_bam_path}" "${REF_GENOME}" "${OUTPUT_DIR}" "${MEM_IN_MB}"
+        collect_multiple_metrics "/in/${sorted_bam_name}" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectHsMetrics" == true ]]; then
-        collect_hs_metrics "${sorted_bam_path}" targets.picard genome.fa "${OUTPUT_DIR}" "${MEM_IN_MB}"
+        collect_hs_metrics "/in/${sorted_bam_name}" "/in/targets.picard" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-        collect_targeted_pcr_metrics "${sorted_bam_path}" genome.fa targets.picard "${OUTPUT_DIR}" "${MEM_IN_MB}"
+        collect_targeted_pcr_metrics "/in/${sorted_bam_name}" "/in/genome.fa" "/in/targets.picard" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
         # Create refFlat file if not provided by user
         if [ -z "$ref_annot_refflat" ]; then
             echo "No refFlat file provided - creating GTF from refFlat file in CTAT bundle"
-            LIB_DIR=$(echo $fasta_index_name | cut -d "." -f 1,2)
-            REF_ANNOT_GTF="/home/dnanexus/${LIB_DIR}/ctat_genome_lib_build_dir/ref_annot.gtf"
-            java -Xmx"${MEM_IN_MB}" -jar /GtftoRefflat-assembly-0.1.jar \
-                -g "${REF_ANNOT_GTF}" \
-                -r "${LIB_DIR}_ref_annot.refflat"
-            REF_FLAT="${LIB_DIR}_ref_annot.refflat"
+            REF_FLAT="${FASTA_INDEX_NAME}_ref_annot.refflat"
+            OUTPUT_FILE="${OUTPUT_DIR}/${FASTA_INDEX_NAME}_ref_annot.refflat"
+            make_refflat "/ctat_libdir/ref_annot.gtf" "/in/${REF_FLAT}" "${MEM_IN_MB}"
         else
-            REF_FLAT="${ref_annot_refflat_path}"
+            REF_FLAT="${ref_annot_refflat_name}"
         fi
-        collect_rnaseq_metrics "${sorted_bam_path}" "${REF_FLAT}" "${OUTPUT_DIR}" "${MEM_IN_MB}"
+        collect_rnaseq_metrics "/in/${sorted_bam_name}" "/in/${REF_FLAT}" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
-        collect_variant_calling_metrics "${vcf_path}" "${dbsnp_vcf_path}" genome.dict "${OUTPUT_DIR}" "${MEM_IN_MB}"
+        collect_variant_calling_metrics "/in/${vcf_name}" "/in/${dbsnp_vcf_name}" "/in/genome.dict" "/out/" "${MEM_IN_MB}"
     fi
 
     dx-upload-all-outputs --parallel
