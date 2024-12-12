@@ -27,7 +27,7 @@ function create_interval_file() {
     local OUTPUT_TARGETS=$3
     local MAXHEAP=$4
 
-	docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar BedToIntervalList \
+	docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar BedToIntervalList \
 	    -I="${BEDFILE_PATH}" \
 	    -O="${OUTPUT_TARGETS}" \
 	    -SD="${SORTED_BAM}"
@@ -52,7 +52,7 @@ collect_targeted_pcr_metrics() {
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectTargetedPcrMetrics  \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectTargetedPcrMetrics  \
         -I="${SORTED_BAM}" \
         -R="${REF_GENOME}" \
 	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
@@ -81,7 +81,7 @@ collect_multiple_metrics() {
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectMultipleMetrics \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectMultipleMetrics \
         -I="${SORTED_BAM}" \
         -R="${REF_GENOME}" \
 	    --PROGRAM=null \
@@ -114,7 +114,7 @@ collect_hs_metrics() {
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectHsMetrics \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectHsMetrics \
         --BI="${TARGETS_FILE}" \
         --TI="${TARGETS_FILE}" \
         --I="${SORTED_BAM}" \
@@ -141,7 +141,7 @@ collect_rnaseq_metrics() {
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
-    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /picard.jar CollectRnaSeqMetrics \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectRnaSeqMetrics \
         -I="${SORTED_BAM}" \
         -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
         --REF_FLAT="${REF_FLAT}" \
