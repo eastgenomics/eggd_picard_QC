@@ -28,9 +28,9 @@ function create_interval_file() {
     local MAXHEAP=$4
 
 	docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar BedToIntervalList \
-	    -I="${BEDFILE_PATH}" \
-	    -O="${OUTPUT_TARGETS}" \
-	    -SD="${SORTED_BAM}"
+	    -I "${BEDFILE_PATH}" \
+	    -O "${OUTPUT_TARGETS}" \
+	    -SD "${SORTED_BAM}"
 }
 
 # collect_targeted_pcr_metrics() - Collects targeted PCR metrics
@@ -53,12 +53,12 @@ collect_targeted_pcr_metrics() {
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectTargetedPcrMetrics  \
-        -I="${SORTED_BAM}" \
-        -R="${REF_GENOME}" \
-	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
-        -AI="${TARGETS_FILE}" \
-        -TI="${TARGETS_FILE}" \
-        --PER_TARGET_COVERAGE="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.perTargetCov.txt"
+        -I "${SORTED_BAM}" \
+        -R "${REF_GENOME}" \
+	    -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
+        -AI "${TARGETS_FILE}" \
+        -TI "${TARGETS_FILE}" \
+        --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.perTargetCov.txt"
 }
 
 # collect_multiple_metrics() - Collected multiple metrics. Note that not all outputs are relevant for all type of sequencing.
@@ -82,17 +82,17 @@ collect_multiple_metrics() {
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectMultipleMetrics \
-        -I="${SORTED_BAM}" \
-        -R="${REF_GENOME}" \
-	    --PROGRAM=null \
-	    --PROGRAM=CollectAlignmentSummaryMetrics \
-	    --PROGRAM=CollectInsertSizeMetrics \
-	    --PROGRAM=QualityScoreDistribution \
-	    --PROGRAM=MeanQualityByCycle \
-	    --PROGRAM=CollectBaseDistributionByCycle \
-	    --PROGRAM=CollectGcBiasMetrics \
-	    --PROGRAM=CollectQualityYieldMetrics \
-	    -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}"
+        -I "${SORTED_BAM}" \
+        -R "${REF_GENOME}" \
+	    --PROGRAM null \
+	    --PROGRAM CollectAlignmentSummaryMetrics \
+	    --PROGRAM CollectInsertSizeMetrics \
+	    --PROGRAM QualityScoreDistribution \
+	    --PROGRAM MeanQualityByCycle \
+	    --PROGRAM CollectBaseDistributionByCycle \
+	    --PROGRAM CollectGcBiasMetrics \
+	    --PROGRAM CollectQualityYieldMetrics \
+	    -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}"
 }
 
 # collect_hs_metrics() - Collect hybrid-selection (HS) metrics.
@@ -115,13 +115,13 @@ collect_hs_metrics() {
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectHsMetrics \
-        --BI="${TARGETS_FILE}" \
-        --TI="${TARGETS_FILE}" \
-        --I="${SORTED_BAM}" \
-        --O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
-        --R="${REF_GENOME}" \
-        --PER_TARGET_COVERAGE="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv"\
-        --COVERAGE_CAP=100000
+        --BI "${TARGETS_FILE}" \
+        --TI "${TARGETS_FILE}" \
+        --I "${SORTED_BAM}" \
+        --O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
+        --R "${REF_GENOME}" \
+        --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv"\
+        --COVERAGE_CAP 100000
 }
 
 # collect_rnaseq_metrics() - Collect RNA-seq metrics
@@ -142,10 +142,10 @@ collect_rnaseq_metrics() {
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectRnaSeqMetrics \
-        -I="${SORTED_BAM}" \
-        -O="${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
-        --REF_FLAT="${REF_FLAT}" \
-        -STRAND=SECOND_READ_TRANSCRIPTION_STRAND
+        -I "${SORTED_BAM}" \
+        -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
+        --REF_FLAT "${REF_FLAT}" \
+        -STRAND SECOND_READ_TRANSCRIPTION_STRAND
 }
 
 # collect_variant_calling_metrics() - Collect variant calling metrics
@@ -168,10 +168,10 @@ collect_variant_calling_metrics() {
     VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
-        --DBSNP="${DBSNP_VCF}" \
-        --INPUT="${VCF}" \
-        --OUTPUT="${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
-        --SEQUENCE_DICTIONARY="${SEQ_DICT}" \
+        --DBSNP "${DBSNP_VCF}" \
+        --INPUT "${VCF}" \
+        --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
+        --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
         --GVCF_INPUT true
 }
 
