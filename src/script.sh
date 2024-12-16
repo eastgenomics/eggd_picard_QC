@@ -213,8 +213,8 @@ main() {
         exit 1
     fi
 
-    if [[ "$run_CollectRnaSeqMetrics" == "true" && -z "$sorted_bam" ]]; then
-        err "run_CollectRnaSeqMetrics was requested, but sorted_bam is missing. Exiting..."
+    if [[ "$run_CollectRnaSeqMetrics" == "true" && ( -z "$sorted_bam" || -z "$ref_annot_refflat" ) ]]; then
+        err "run_CollectRnaSeqMetrics was requested, but one or more of sorted_bam or ref_annot_refflat are missing. Exiting..."
         exit 1
     fi
 
@@ -236,19 +236,12 @@ main() {
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
     mkdir -p "$OUTPUT_DIR"
 
-    # Start container process in background, and use docker exec to run multiple commands.
-    # This is because we need the docker container to persist between steps
-    ## note that mount point for GTF needs to be made first
-    GENOME_BUILD_NAME=$(basename $fasta_index_name .tar.gz)
-    CTAT_LIBDIR="/home/dnanexus/${GENOME_BUILD_NAME}/ctat_genome_lib_build_dir"
-
     DOCKER_IMAGENAME=$(find /image -name "*.tar.gz")
     sudo docker load -i "${DOCKER_IMAGENAME}"
     DOCKER_IMAGE=$(docker image ls -q)
     docker run \
         --name picard_image \
         --mount type=bind,source=/home/dnanexus/in/,target=/in \
-        --mount type=bind,source="${CTAT_LIBDIR}",target=/ctat_libdir \
         --mount type=bind,source="${OUTPUT_DIR}",target=/out \
         --entrypoint /bin/bash \
         -itd "${DOCKER_IMAGE}"
@@ -275,16 +268,7 @@ main() {
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-        # Create refFlat file if not provided by user
-        if [ -z "$ref_annot_refflat" ]; then
-            echo "No refFlat file provided - creating GTF from refFlat file in CTAT bundle"
-            REF_FLAT="${GENOME_BUILD_NAME}_ref_annot.refflat"
-            OUTPUT_FILE="${OUTPUT_DIR}/${GENOME_BUILD_NAME}_ref_annot.refflat"
-            make_refflat "/ctat_libdir/ref_annot.gtf" "/in/${REF_FLAT}" "${MEM_IN_MB}"
-        else
-            REF_FLAT="${ref_annot_refflat_name}"
-        fi
-        collect_rnaseq_metrics "/in/${sorted_bam_name}" "/in/${REF_FLAT}" "/out/" "${MEM_IN_MB}"
+        collect_rnaseq_metrics "/in/${sorted_bam_name}" "/in/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
