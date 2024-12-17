@@ -69,9 +69,6 @@ collect_targeted_pcr_metrics() {
 #   $2 - Path to reference genome
 #   $3 - Path to output directory
 #   $4 - Java maximum heap size
-#
-# TODO: Investigate CollectSequencingArtifactMetrics - it errors out with TSO500 BAMs due to
-# "Record contains library that is missing from header", and so is not used (fix unclear)
 collect_multiple_metrics() {
     local SORTED_BAM=$1
     local REF_GENOME=$2
