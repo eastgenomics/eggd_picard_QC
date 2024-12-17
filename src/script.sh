@@ -251,28 +251,28 @@ main() {
         [[ "$run_CollectHsMetrics" == true ]] || \
         [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
         echo "Generating interval file"
-        create_interval_file "/in/${bedfile_name}" "/in/${sorted_bam_name}" "/in/targets.picard" "${MEM_IN_MB}"
+        create_interval_file "/in/bedfile/${bedfile_name}" "/in/sorted_bam/${sorted_bam_name}" "/in/targets.picard" "${MEM_IN_MB}"
     fi
 
     ## Run picard commands
     if [[ "$run_CollectMultipleMetrics" == true ]]; then
-        collect_multiple_metrics "/in/${sorted_bam_name}" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_multiple_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectHsMetrics" == true ]]; then
-        collect_hs_metrics "/in/${sorted_bam_name}" "/in/targets.picard" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_hs_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/targets.picard" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-        collect_targeted_pcr_metrics "/in/${sorted_bam_name}" "/in/genome.fa" "/in/targets.picard" "/out/" "${MEM_IN_MB}"
+        collect_targeted_pcr_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/genome.fa" "/in/targets.picard" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-        collect_rnaseq_metrics "/in/${sorted_bam_name}" "/in/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
+        collect_rnaseq_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/ref_annot_refflat/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
-        collect_variant_calling_metrics "/in/${vcf_name}" "/in/${dbsnp_vcf_name}" "/in/genome.dict" "/out/" "${MEM_IN_MB}"
+        collect_variant_calling_metrics "/in/vcf/${vcf_name}" "/in/dbsnp_vcf/${dbsnp_vcf_name}" "/in/genome.dict" "/out/" "${MEM_IN_MB}"
     fi
 
     dx-upload-all-outputs --parallel
