@@ -175,23 +175,6 @@ collect_variant_calling_metrics() {
         --GVCF_INPUT true
 }
 
-# make_refflat() - generates refFlat file 
-# See https://biopet.github.io/gtftorefflat/develop/ for details
-#
-# Arguments:
-#   $1 - path to input GTF
-#   $2 - path to output refFlat file
-#   $3 - Java maximum heap size
-make_refflat() {
-    local GTF=$1
-    local OUTPUT_REFFLAT=$2
-    local MAXHEAP=$3
-
-    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/bin/GtftoRefflat-assembly-0.1.jar \
-        -g "${GTF}" \
-        -r "${OUTPUT_REFFLAT}"
-}
-
 main() {
     ## Sanity checks
     # Exit if no picard functions selected
