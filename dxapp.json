@@ -123,13 +123,13 @@
   "runSpec": {
     "assetDepends": [
         {
-            "id": "record-Gx9Xpp84jvk540yp7QgKqJ89"
+            "id": "record-GxQ3xgj4zj7QX1GG7Fv6f8yg"
         }
     ],
     "systemRequirementsByRegion": {
       "aws:eu-central-1": {
         "main": {
-          "instanceType": "mem1_ssd1_x4"
+          "instanceType": "mem1_ssd2_v2_x8"
         }
       },
     "timeoutPolicy": {
