@@ -123,7 +123,9 @@
   "runSpec": {
     "assetDepends": [
         {
-            "id": "record-GxQ3xgj4zj7QX1GG7Fv6f8yg"
+            "id": "record-GxQ3xgj4zj7QX1GG7Fv6f8yg",
+            "name": "picardqc-image",
+            "version": "1.2.0"
         }
     ],
     "systemRequirementsByRegion": {
