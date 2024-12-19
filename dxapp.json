@@ -121,15 +121,17 @@
     }
   ],
   "runSpec": {
-    "execDepends": [
-      {
-        "name": "openjdk-8-jre-headless"
-      }
+    "assetDepends": [
+        {
+            "id": "record-GxQkp2j4yK6BzqjZ048Xy3GP",
+            "name": "picardqc-image",
+            "version": "1.2.0"
+        }
     ],
     "systemRequirementsByRegion": {
       "aws:eu-central-1": {
         "main": {
-          "instanceType": "mem1_ssd1_x4"
+          "instanceType": "mem1_ssd2_v2_x8"
         }
       },
     "timeoutPolicy": {
@@ -138,7 +140,7 @@
         }
       }
     },
-    "file": "src/code.sh",
+    "file": "src/script.sh",
     "interpreter": "bash",
     "distribution": "Ubuntu",
     "release":"20.04",
