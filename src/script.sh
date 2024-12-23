@@ -209,7 +209,8 @@ main() {
     dx-download-all-inputs
 
     ### move all inputs to flat /home/dnanexus/input/ directory
-    find ~/in -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input
+    mkdir -p ~/input/
+    find ~/in -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input/
 
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
