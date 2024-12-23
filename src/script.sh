@@ -199,8 +199,8 @@ main() {
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == "true" && \
-        ( -z "$vcf" || -z "$dbsnp_vcf" ) ]]; then
-        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
+        ( -z "$vcf" || -z "$vcf_index" || -z "$dbsnp_vcf" ) ]]; then
+        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf, vcf_index, or dbsnp_vcf are missing. Exiting..."
         exit 1
     fi
 
@@ -208,11 +208,15 @@ main() {
     ### puts inputs in /home/dnanexus/in/
     dx-download-all-inputs
 
+    ### move all inputs to flat /home/dnanexus/input/ directory
+    mkdir -p ~/input/
+    find ~/in -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input/
+
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
     MEM_IN_MB="$(("${MEM}"/1024))m"
 
-    tar zxvf "$fasta_index_path" -C in/ 
+    tar zxvf ~/input/${fasta_index_name} -C ~/input/ 
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
     mkdir -p "$OUTPUT_DIR"
 
@@ -221,7 +225,7 @@ main() {
     DOCKER_IMAGE=$(docker image ls -q)
     docker run \
         --name picard_image \
-        --mount type=bind,source=/home/dnanexus/in/,target=/in \
+        --mount type=bind,source=/home/dnanexus/input/,target=/input \
         --mount type=bind,source="${OUTPUT_DIR}",target=/out \
         --entrypoint /bin/bash \
         -itd "${DOCKER_IMAGE}"
@@ -231,28 +235,28 @@ main() {
         [[ "$run_CollectHsMetrics" == true ]] || \
         [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
         echo "Generating interval file"
-        create_interval_file "/in/bedfile/${bedfile_name}" "/in/sorted_bam/${sorted_bam_name}" "/in/targets.picard" "${MEM_IN_MB}"
+        create_interval_file "/input/${bedfile_name}" "/input/${sorted_bam_name}" "/input/targets.picard" "${MEM_IN_MB}"
     fi
 
     ## Run picard commands
     if [[ "$run_CollectMultipleMetrics" == true ]]; then
-        collect_multiple_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_multiple_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectHsMetrics" == true ]]; then
-        collect_hs_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/targets.picard" "/in/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_hs_metrics "/input/${sorted_bam_name}" "/input/targets.picard" "/input/genome.fa" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-        collect_targeted_pcr_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/genome.fa" "/in/targets.picard" "/out/" "${MEM_IN_MB}"
+        collect_targeted_pcr_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/input/targets.picard" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-        collect_rnaseq_metrics "/in/sorted_bam/${sorted_bam_name}" "/in/ref_annot_refflat/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
+        collect_rnaseq_metrics "/input/${sorted_bam_name}" "/input/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
-        collect_variant_calling_metrics "/in/vcf/${vcf_name}" "/in/dbsnp_vcf/${dbsnp_vcf_name}" "/in/genome.dict" "/out/" "${MEM_IN_MB}"
+        collect_variant_calling_metrics "/input/${vcf_name}" "/input/${dbsnp_vcf_name}" "/input/genome.dict" "/out/" "${MEM_IN_MB}"
     fi
 
     dx-upload-all-outputs --parallel

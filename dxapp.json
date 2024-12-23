@@ -59,6 +59,14 @@
       "optional": true
     },
     {
+      "name": "vcf_index",
+      "label": "VCF index",
+      "help": "Index file for compressed sample VCF (provided to `-ivcf`)",
+      "class": "file",
+      "patterns": ["*.vcf.gz.tbi", "*.vcf.gz.idx"],
+      "optional": true
+    },
+    {
       "name": "dbsnp_vcf",
       "label": "dbSNP VCF",
       "help": "VCF reference file containing dbSNP variants",
