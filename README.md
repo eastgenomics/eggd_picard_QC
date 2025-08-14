@@ -95,7 +95,6 @@ https://broadinstitute.github.io/picard/picard-metric-definitions.html
 
 ## How does this app work?
 This app downloads the given input files and uses BAM and BED files to create a picard intervals_list file. 
-Depending on the capture/amplicon flag either Picard TargetedPcrMetrics or both Picard CollectMultipleMetrics and Picard CalculateHsMetrics are then called. 
+Depending on the capture/amplicon flag either Picard TargetedPcrMetrics or both Picard CollectMultipleMetrics and Picard CollectHsMetrics are then called. 
 If variant-calling is requested, the app downloads the VCF, reference genome and dbSNP file, and runs Picard CollectVariantCallingMetrics on the inputs.
-
 All output files are uploaded into the directory 'QC'.
