@@ -179,7 +179,7 @@ collect_variant_calling_metrics() {
         --DBSNP "${DBSNP_VCF}" \
         --INPUT "${VCF}" \
         --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
-        --SEQUENCE_DICTIONARY "${SEQ_DICT}"  \
+        --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
         --GVCF_INPUT "${GVCF_INPUT}"
 }
 
