@@ -162,14 +162,20 @@ collect_variant_calling_metrics() {
     local MAXHEAP=$5
 
     local VCF_PREFIX
-    VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
+    VCF_PREFIX=${VCF%".*"}
+
+    if [[ $VCF == *.vcf.gz ]]; then
+        GVCF_INPUT="true"
+    else
+        GVCF_INPUT="false"
+    fi
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
         --DBSNP "${DBSNP_VCF}" \
         --INPUT "${VCF}" \
         --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
-        --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
-        --GVCF_INPUT true
+        --SEQUENCE_DICTIONARY "${SEQ_DICT}"  \
+        --GVCF_INPUT "${GVCF_INPUT}"
 }
 
 main() {
