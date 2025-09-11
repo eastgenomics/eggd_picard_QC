@@ -215,11 +215,6 @@ main() {
             exit 1
         fi
 
-        if [[ $vcf == *.vcf.gz ]]; then
-            if [ -z "$vcf_index" ]; then
-                tabix "$vcf"
-            fi
-        fi
     fi
 
     ## Setup 
@@ -230,10 +225,17 @@ main() {
     mkdir -p ~/input/
     find ~/in -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input/
 
+    ### run
+    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
+        if [[ $vcf == *.vcf.gz ]]; then
+            if [ -z "$vcf_index" ]; then
+                tabix ~/input/$vcf_name
+            fi
+        fi
+    fi
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
     MEM_IN_MB="$(("${MEM}"/1024))m"
-
     tar zxvf ~/input/${fasta_index_name} -C ~/input/ 
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
     mkdir -p "$OUTPUT_DIR"
