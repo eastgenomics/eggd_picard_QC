@@ -210,7 +210,7 @@ main() {
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
-        if [ -z "$vcf" ] || [ -z "$dbsnp_vcf" ]; then
+        if [ -z "$vcf" ] || [ -z "$dbsnp_vcf" ] || [ -z "$fasta_index" ]; then
             err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
             exit 1
         fi
