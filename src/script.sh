@@ -162,12 +162,17 @@ collect_variant_calling_metrics() {
     local MAXHEAP=$5
 
     local VCF_PREFIX
-    VCF_PREFIX=${VCF%".*"}
+    local VCF_BASENAME VCF_PREFIX
+    VCF_BASENAME="$(basename -- "$VCF")"
+    VCF_PREFIX="${VCF_BASENAME%.vcf.gz}"
+    VCF_PREFIX="${VCF_PREFIX%.vcf}"
 
-    if [[ $VCF == *.vcf.gz ]]; then
-        GVCF_INPUT="true"
+    # Default to false; detect gVCF via presence of <NON_REF> in the first data line
+    GVCF_INPUT="false"
+    if [[ "$VCF" == *.gz ]]; then
+        if zgrep -m1 -v '^#' -- "$VCF" | grep -q '<NON_REF>'; then GVCF_INPUT="true"; fi
     else
-        GVCF_INPUT="false"
+        if grep -m1 -v '^#' -- "$VCF" | grep -q '<NON_REF>'; then GVCF_INPUT="true"; fi
     fi
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
