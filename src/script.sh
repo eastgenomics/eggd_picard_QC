@@ -214,7 +214,6 @@ main() {
             err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
             exit 1
         fi
-
     fi
 
     ## Setup 
