@@ -204,10 +204,17 @@ main() {
         exit 1
     fi
 
-    if [[ "$run_CollectVariantCallingMetrics" == "true" && \
-        ( -z "$vcf" || -z "$vcf_index" || -z "$dbsnp_vcf" ) ]]; then
-        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf, vcf_index, or dbsnp_vcf are missing. Exiting..."
-        exit 1
+    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
+        if [ -z "$vcf" ] || [ -z "$dbsnp_vcf" ]; then
+            err "run_CollectVariantCallingMetrics was requested, but one or more of vcf or dbsnp_vcf are missing. Exiting..."
+            exit 1
+        fi
+
+        if [[ $vcf == *.vcf.gz ]]; then
+            if [ -z "$vcf_index" ]; then
+                tabix "$vcf"
+            fi
+        fi
     fi
 
     ## Setup 
