@@ -221,18 +221,21 @@ main() {
     ### puts inputs in /home/dnanexus/in/
     dx-download-all-inputs
 
+    ### Here is the best place to do the index checking,
+    ### because the next step makes all of the DNANexus
+    ### variables I'm using here obsolete
+    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
+        if [[ $vcf == *.vcf.gz ]]; then
+            if [ -z $vcf_index ]; then
+                tabix $vcf
+            fi
+        fi
+    fi
+
     ### move all inputs to flat /home/dnanexus/input/ directory
     mkdir -p ~/input/
     find ~/in -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input/
 
-    ### run
-    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
-        if [[ $vcf == *.vcf.gz ]]; then
-            if [ -z "$vcf_index" ]; then
-                tabix ~/input/$vcf_name
-            fi
-        fi
-    fi
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
     MEM_IN_MB="$(("${MEM}"/1024))m"
