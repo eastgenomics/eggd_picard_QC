@@ -134,6 +134,11 @@
             "id": "record-GxQkp2j4yK6BzqjZ048Xy3GP",
             "name": "picardqc-image",
             "version": "1.2.0"
+        },
+        {
+            "id": "record-J1YBvy049yKpP7kk1j4ggqxZ",
+            "name": "htslib_suite_asset",
+            "version": "1.22.0"
         }
     ],
     "systemRequirementsByRegion": {
