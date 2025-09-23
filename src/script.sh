@@ -162,14 +162,25 @@ collect_variant_calling_metrics() {
     local MAXHEAP=$5
 
     local VCF_PREFIX
-    VCF_PREFIX=$(basename "${VCF}" .vcf.gz)
+    local VCF_BASENAME VCF_PREFIX
+    VCF_BASENAME="$(basename -- "$VCF")"
+    VCF_PREFIX="${VCF_BASENAME%.vcf.gz}"
+    VCF_PREFIX="${VCF_PREFIX%.vcf}"
+
+    # Default to false; detect gVCF via presence of <NON_REF> in the first data line
+    GVCF_INPUT="false"
+    if [[ "$VCF" == *.gz ]]; then
+        if zgrep -m1 -v '^#' -- "$VCF" | grep -q '<NON_REF>'; then GVCF_INPUT="true"; fi
+    else
+        if grep -m1 -v '^#' -- "$VCF" | grep -q '<NON_REF>'; then GVCF_INPUT="true"; fi
+    fi
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
         --DBSNP "${DBSNP_VCF}" \
         --INPUT "${VCF}" \
         --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
         --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
-        --GVCF_INPUT true
+        --GVCF_INPUT "${GVCF_INPUT}"
 }
 
 main() {
@@ -198,15 +209,27 @@ main() {
         exit 1
     fi
 
-    if [[ "$run_CollectVariantCallingMetrics" == "true" && \
-        ( -z "$vcf" || -z "$vcf_index" || -z "$dbsnp_vcf" ) ]]; then
-        err "run_CollectVariantCallingMetrics was requested, but one or more of vcf, vcf_index, or dbsnp_vcf are missing. Exiting..."
-        exit 1
+    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
+        if [ -z "$vcf" ] || [ -z "$dbsnp_vcf" ] || [ -z "$fasta_index" ]; then
+            err "run_CollectVariantCallingMetrics was requested, but one or more of vcf, dbsnp_vcf, or fasta_index are missing. Exiting..."
+            exit 1
+        fi
     fi
 
     ## Setup 
     ### puts inputs in /home/dnanexus/in/
     dx-download-all-inputs
+
+    ### Here is the best place to do the index checking,
+    ### because the next step makes all of the DNANexus
+    ### variables I'm using here obsolete
+    if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
+        if [[ $vcf == *.vcf.gz ]]; then
+            if [ -z $vcf_index ]; then
+                tabix -p vcf $vcf
+            fi
+        fi
+    fi
 
     ### move all inputs to flat /home/dnanexus/input/ directory
     mkdir -p ~/input/
@@ -215,7 +238,6 @@ main() {
     # Calculate 90% of memory size for java
     MEM=$(head -n1 /proc/meminfo | awk '{print int($2*0.9)}')
     MEM_IN_MB="$(("${MEM}"/1024))m"
-
     tar zxvf ~/input/${fasta_index_name} -C ~/input/ 
     OUTPUT_DIR="${HOME}/out/eggd_picard_stats/QC"
     mkdir -p "$OUTPUT_DIR"
