@@ -226,7 +226,7 @@ main() {
     if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
         if [[ $vcf == *.vcf.gz ]]; then
             if [ -z $vcf_index ]; then
-                tabix $vcf
+                tabix -p vcf $vcf
             fi
         fi
     fi
