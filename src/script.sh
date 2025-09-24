@@ -224,13 +224,13 @@ main() {
     ### because the next step makes all of the DNANexus
     ### variables I'm using here obsolete
     if [[ "$run_CollectVariantCallingMetrics" == "true" ]]; then
-        if [[ $vcf_name == *.vcf ]]; then
-            bgzip $vcf_path
-            tabix -p vcf "${vcf_path}.gz"
+        if [[ $vcf == *.vcf ]]; then
+            bgzip $vcf
+            tabix -p vcf "${vcf}.gz"
             vcf_name="${vcf_name}.gz"
-        elif [[ $vcf_name == *.vcf.gz ]]; then
-            if [ -z $vcf_index_path ]; then
-                tabix -p vcf $vcf_path
+        elif [[ $vcf == *.vcf.gz ]]; then
+            if [ -z $vcf_index ]; then
+                tabix -p vcf $vcf
             fi
         fi
     fi
