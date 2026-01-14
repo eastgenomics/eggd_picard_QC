@@ -75,6 +75,15 @@
       "optional": true
     },
     {
+      "name": "stringency",
+      "label": "validation stringency",
+      "class": "string",
+      "help": "SAM file validation stringency. Possible values: strict, lenient, silent",
+      "choices": ["strict", "lenient", "silent"],
+      "default": "strict",
+      "optional": true
+    },
+    {
       "name": "run_CollectMultipleMetrics",
       "label": "Choose whether to run Picard CollectMultipleMetrics",
       "help": "Specifically, run CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, MeanQualityByCycle, CollectBaseDistributionByCycle, CollectGcBiasMetrics, CollectQualityYieldMetrics. See https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-",
