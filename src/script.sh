@@ -26,11 +26,13 @@ function create_interval_file() {
     local SORTED_BAM=$2
     local OUTPUT_TARGETS=$3
     local MAXHEAP=$4
+    local STRINGENCY=$5
 
-	docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar BedToIntervalList \
+    docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar BedToIntervalList \
 	    -I "${BEDFILE_PATH}" \
-	    -O "${OUTPUT_TARGETS}" \
-	    -SD "${SORTED_BAM}"
+            -O "${OUTPUT_TARGETS}" \
+            -SD "${SORTED_BAM}" \
+            --VALIDATION_STRINGENCY "${STRINGENCY}"
 }
 
 # collect_targeted_pcr_metrics() - Collects targeted PCR metrics
@@ -48,17 +50,19 @@ collect_targeted_pcr_metrics() {
     local TARGETS_FILE=$3
     local OUTPUT_DIR=$4
     local MAXHEAP=$5
+    local STRINGENCY=$6
 
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectTargetedPcrMetrics  \
-        -I "${SORTED_BAM}" \
-        -R "${REF_GENOME}" \
-	    -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
-        -AI "${TARGETS_FILE}" \
-        -TI "${TARGETS_FILE}" \
-        --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.perTargetCov.txt"
+	    -I "${SORTED_BAM}" \
+            -R "${REF_GENOME}" \
+            -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.targetPCRmetrics.txt" \
+            -AI "${TARGETS_FILE}" \
+            -TI "${TARGETS_FILE}" \
+            --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.perTargetCov.txt" \
+            --VALIDATION_STRINGENCY "${STRINGENCY}"
 }
 
 # collect_multiple_metrics() - Collected multiple metrics. Note that not all outputs are relevant for all type of sequencing.
@@ -74,22 +78,24 @@ collect_multiple_metrics() {
     local REF_GENOME=$2
     local OUTPUT_DIR=$3
     local MAXHEAP=$4
+    local STRINGENCY=$5
 
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectMultipleMetrics \
-        -I "${SORTED_BAM}" \
-        -R "${REF_GENOME}" \
-	    --PROGRAM null \
-	    --PROGRAM CollectAlignmentSummaryMetrics \
-	    --PROGRAM CollectInsertSizeMetrics \
-	    --PROGRAM QualityScoreDistribution \
-	    --PROGRAM MeanQualityByCycle \
-	    --PROGRAM CollectBaseDistributionByCycle \
-	    --PROGRAM CollectGcBiasMetrics \
-	    --PROGRAM CollectQualityYieldMetrics \
-	    -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}"
+	    -I "${SORTED_BAM}" \
+            -R "${REF_GENOME}" \
+            --PROGRAM null \
+            --PROGRAM CollectAlignmentSummaryMetrics \
+            --PROGRAM CollectInsertSizeMetrics \
+            --PROGRAM QualityScoreDistribution \
+            --PROGRAM MeanQualityByCycle \
+            --PROGRAM CollectBaseDistributionByCycle \
+            --PROGRAM CollectGcBiasMetrics \
+            --PROGRAM CollectQualityYieldMetrics \
+            -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}" \
+            --VALIDATION_STRINGENCY "${STRINGENCY}"
 }
 
 # collect_hs_metrics() - Collect hybrid-selection (HS) metrics.
@@ -107,18 +113,20 @@ collect_hs_metrics() {
     local REF_GENOME=$3
     local OUTPUT_DIR=$4
     local MAXHEAP=$5
+    local STRINGENCY=$6
 
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectHsMetrics \
-        --BI "${TARGETS_FILE}" \
-        --TI "${TARGETS_FILE}" \
-        --I "${SORTED_BAM}" \
-        --O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
-        --R "${REF_GENOME}" \
-        --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv"\
-        --COVERAGE_CAP 100000
+	    --BI "${TARGETS_FILE}" \
+	    --TI "${TARGETS_FILE}" \
+	    --I "${SORTED_BAM}" \
+	    --O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.hsmetrics.tsv" \
+	    --R "${REF_GENOME}" \
+	    --PER_TARGET_COVERAGE "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.pertarget_coverage.tsv" \
+	    --COVERAGE_CAP 100000 \
+	    --VALIDATION_STRINGENCY "${STRINGENCY}"
 }
 
 # collect_rnaseq_metrics() - Collect RNA-seq metrics
@@ -134,15 +142,17 @@ collect_rnaseq_metrics() {
     local REF_FLAT=$2
     local OUTPUT_DIR=$3
     local MAXHEAP=$4
+    local STRINGENCY=$5
 
     local SORTED_BAM_PREFIX
     SORTED_BAM_PREFIX=$(basename "${SORTED_BAM}" .bam)
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectRnaSeqMetrics \
-        -I "${SORTED_BAM}" \
-        -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
-        --REF_FLAT "${REF_FLAT}" \
-        -STRAND SECOND_READ_TRANSCRIPTION_STRAND
+	    -I "${SORTED_BAM}" \
+	    -O "${OUTPUT_DIR}/${SORTED_BAM_PREFIX}.RNAmetrics.tsv" \
+	    --REF_FLAT "${REF_FLAT}" \
+	    -STRAND SECOND_READ_TRANSCRIPTION_STRAND \
+	    --VALIDATION_STRINGENCY "${STRINGENCY}"
 }
 
 # collect_variant_calling_metrics() - Collect variant calling metrics
@@ -176,11 +186,11 @@ collect_variant_calling_metrics() {
     fi
 
     docker exec picard_image java -Xmx"${MAXHEAP}" -jar /usr/picard/picard.jar CollectVariantCallingMetrics \
-        --DBSNP "${DBSNP_VCF}" \
-        --INPUT "${VCF}" \
-        --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
-        --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
-        --GVCF_INPUT "${GVCF_INPUT}"
+	    --DBSNP "${DBSNP_VCF}" \
+            --INPUT "${VCF}" \
+            --OUTPUT "${OUTPUT_DIR}/${VCF_PREFIX}.variantcallingmetrics" \
+            --SEQUENCE_DICTIONARY "${SEQ_DICT}" \
+            --GVCF_INPUT "${GVCF_INPUT}"
 }
 
 main() {
@@ -261,24 +271,24 @@ main() {
         [[ "$run_CollectHsMetrics" == true ]] || \
         [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
         echo "Generating interval file"
-        create_interval_file "/input/${bedfile_name}" "/input/${sorted_bam_name}" "/input/targets.picard" "${MEM_IN_MB}"
+        create_interval_file "/input/${bedfile_name}" "/input/${sorted_bam_name}" "/input/targets.picard" "${MEM_IN_MB}" "${stringency}"
     fi
 
     ## Run picard commands
     if [[ "$run_CollectMultipleMetrics" == true ]]; then
-        collect_multiple_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_multiple_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency}"
     fi
 
     if [[ "$run_CollectHsMetrics" == true ]]; then
-        collect_hs_metrics "/input/${sorted_bam_name}" "/input/targets.picard" "/input/genome.fa" "/out/" "${MEM_IN_MB}"
+        collect_hs_metrics "/input/${sorted_bam_name}" "/input/targets.picard" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency}"
     fi
 
     if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-        collect_targeted_pcr_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/input/targets.picard" "/out/" "${MEM_IN_MB}"
+        collect_targeted_pcr_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/input/targets.picard" "/out/" "${MEM_IN_MB}" "${stringency}"
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-        collect_rnaseq_metrics "/input/${sorted_bam_name}" "/input/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}"
+        collect_rnaseq_metrics "/input/${sorted_bam_name}" "/input/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}" "${stringency}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
