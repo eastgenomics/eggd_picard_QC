@@ -271,24 +271,24 @@ main() {
         [[ "$run_CollectHsMetrics" == true ]] || \
         [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
         echo "Generating interval file"
-        create_interval_file "/input/${bedfile_name}" "/input/${sorted_bam_name}" "/input/targets.picard" "${MEM_IN_MB}" "${stringency}"
+        create_interval_file "/input/${bedfile_name}" "/input/${sorted_bam_name}" "/input/targets.picard" "${MEM_IN_MB}" "${stringency^^}"
     fi
 
     ## Run picard commands
     if [[ "$run_CollectMultipleMetrics" == true ]]; then
-        collect_multiple_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency}"
+        collect_multiple_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency^^}"
     fi
 
     if [[ "$run_CollectHsMetrics" == true ]]; then
-        collect_hs_metrics "/input/${sorted_bam_name}" "/input/targets.picard" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency}"
+        collect_hs_metrics "/input/${sorted_bam_name}" "/input/targets.picard" "/input/genome.fa" "/out/" "${MEM_IN_MB}" "${stringency^^}"
     fi
 
     if [[ "$run_CollectTargetedPcrMetrics" == true ]]; then
-        collect_targeted_pcr_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/input/targets.picard" "/out/" "${MEM_IN_MB}" "${stringency}"
+        collect_targeted_pcr_metrics "/input/${sorted_bam_name}" "/input/genome.fa" "/input/targets.picard" "/out/" "${MEM_IN_MB}" "${stringency^^}"
     fi
 
     if [[ "$run_CollectRnaSeqMetrics" == true ]]; then
-        collect_rnaseq_metrics "/input/${sorted_bam_name}" "/input/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}" "${stringency}"
+        collect_rnaseq_metrics "/input/${sorted_bam_name}" "/input/${ref_annot_refflat_name}" "/out/" "${MEM_IN_MB}" "${stringency^^}"
     fi
 
     if [[ "$run_CollectVariantCallingMetrics" == true ]]; then
