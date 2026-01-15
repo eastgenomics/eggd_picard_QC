@@ -1,7 +1,7 @@
 {
   "name": "eggd_picard_QC",
   "title": "eggd_picard_QC",
-  "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics and CollectRnaSeqMetrics",
+  "summary": "Run Picard Tools suite for sequence QC: CollectMultipleMetrics, CollectHsMetrics, CollectTargetedPcrMetrics, CollectRnaSeqMetrics, and CollectVariantCallingMetrics",
   "version": "1.4.0",
   "dxapi": "1.0.0",
   "authorizedUsers": [
