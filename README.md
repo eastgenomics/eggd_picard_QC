@@ -35,7 +35,7 @@ How the app responds when picard's internal BAM file validation returns warnings
 - silent: app will not print any warnings even if validation issues are found
 
 > [!WARNING]
-> Please note that setting `-istringency` to "lenient" is advised against due to the excessive amount of logging strain it places upon DNANexus; please only use strict or silent when configuring production pipelines.
+> Please note that setting `-istringency` to "lenient" is advised against due to the excessive amount of logging strain it places upon DNANexus; please only use "strict" or "silent" when configuring production pipelines.
 
 ### DNA Alignment QC
 
