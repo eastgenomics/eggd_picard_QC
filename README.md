@@ -26,13 +26,11 @@ All inputs are optional from the perspective of DNANexus, which allows the app t
 
 ### Common arguments
 
-**stringency (default=silent)**
-
-How the app responds when picard's internal BAM file validation returns warnings. Can be one of three settings:
-
-- `strict`: app will fail upon any validation warning
-- `lenient`: app will print warning to logs and continue processing
-- `silent`: app will not print any warnings even if validation issues are found
+- **stringency (default=silent)**
+    - How the app responds when picard's internal BAM file validation returns warnings. Can be one of three settings:
+        - `strict`: app will fail upon any validation warning
+        - `lenient`: app will print warning to logs and continue processing
+        - `silent`: app will not print any warnings even if validation issues are found
 
 > [!WARNING]
 > Please note that setting `-istringency` to "lenient" is advised against due to the excessive amount of logging strain it places upon DNANexus; please only use "strict" or "silent" when configuring production pipelines.
