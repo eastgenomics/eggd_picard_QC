@@ -24,6 +24,9 @@ The outputs of this app are to be displayed visually using [MultiQC](http://mult
 ## What data are required for this app to run?
 All inputs are optional from the perspective of DNANexus, which allows the app the flexibility of running QC on either alignments or variant calls. However, for successful exection, we list which data files are actually required for each mode to run. Bear in mind that some arguments are shared by alignment and variant calling (such as **fasta_index**), and as such care should be taken when running a complete assessment of the data.
 
+> [!WARNING]
+> Please note that setting `-istringency` to "lenient" is advised against due to the excessive amount of logging strain it places upon DNANexus; please only use "strict" or "silent" when configuring production pipelines.
+
 ### Alignment QC
 
 The following files are required for alignment QC analysis to run:
