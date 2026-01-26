@@ -64,7 +64,7 @@ RNA-seq QC is triggered by invoking the following option:
 
 - **run_CollectRnaSeqMetrics=(boolean, default=false)**
   - Calculate RNA-seq metrics from targeted sequencing data.
-  - See [CollectRnaSeqMetrics documentation](https://gatk.broadinstitute.org/hc/en-us/articles/360037225812-CollectRnaSeqMetrics-Picard-)
+  - See [CollectRnaSeqMetrics documentation](https://gatk.broadinstitute.org/hc/en-us/articles/360037226892-CollectRnaSeqMetrics-Picard)
 
 The following files are required for RNA-seq QC analysis to run:
 
